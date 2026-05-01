@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: triage
+    description: AI support triage operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,102 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /triage/process:
+    post:
+      operationId: processTickets
+      tags: [triage]
+      summary: Process support tickets
+      description: Submit CSV tickets for triage processing
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessTicketsBody"
+      responses:
+        "200":
+          description: Processing started or completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProcessTicketsResponse"
+
+  /triage/results:
+    get:
+      operationId: getTriageResults
+      tags: [triage]
+      summary: Get triage results
+      description: Get all processed ticket results
+      responses:
+        "200":
+          description: List of triage results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TriageResultsResponse"
+
+  /triage/logs:
+    get:
+      operationId: getTriageLogs
+      tags: [triage]
+      summary: Get triage logs
+      description: Get the triage processing log
+      responses:
+        "200":
+          description: Log content
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TriageLogsResponse"
+
+  /triage/stats:
+    get:
+      operationId: getTriageStats
+      tags: [triage]
+      summary: Get triage statistics
+      description: Get aggregate statistics about processed tickets
+      responses:
+        "200":
+          description: Triage statistics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TriageStatsResponse"
+
+  /triage/corpus:
+    post:
+      operationId: addCorpusDocument
+      tags: [triage]
+      summary: Add corpus document
+      description: Add a document to the support corpus
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CorpusDocumentBody"
+      responses:
+        "200":
+          description: Document added
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CorpusDocumentResponse"
+
+    get:
+      operationId: getCorpus
+      tags: [triage]
+      summary: Get corpus documents
+      description: List all corpus documents
+      responses:
+        "200":
+          description: Corpus list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CorpusListResponse"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +132,235 @@ components:
       required:
         - status
 
+    ProcessTicketsBody:
+      type: object
+      properties:
+        tickets:
+          type: array
+          items:
+            $ref: "#/components/schemas/SupportTicket"
+      required:
+        - tickets
+
+    SupportTicket:
+      type: object
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        issue:
+          type: string
+        company:
+          type: string
+          nullable: true
+      required:
+        - id
+        - subject
+        - issue
+
+    ProcessTicketsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        processed:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/TriageResult"
+      required:
+        - success
+        - processed
+        - results
+
+    TriageResult:
+      type: object
+      properties:
+        id:
+          type: string
+        subject:
+          type: string
+        issue:
+          type: string
+        company:
+          type: string
+        status:
+          type: string
+          enum: [replied, escalated]
+        product_area:
+          type: string
+        request_type:
+          type: string
+          enum: [product_issue, feature_request, bug, invalid]
+        response:
+          type: string
+        justification:
+          type: string
+        confidence:
+          type: number
+        risk_level:
+          type: string
+          enum: [low, medium, high]
+        retrieved_docs:
+          type: array
+          items:
+            type: string
+        processed_at:
+          type: string
+      required:
+        - id
+        - subject
+        - issue
+        - company
+        - status
+        - product_area
+        - request_type
+        - response
+        - justification
+        - confidence
+        - risk_level
+        - retrieved_docs
+        - processed_at
+
+    TriageResultsResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/TriageResult"
+        total:
+          type: integer
+      required:
+        - results
+        - total
+
+    TriageLogsResponse:
+      type: object
+      properties:
+        log:
+          type: string
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/LogEntry"
+      required:
+        - log
+        - entries
+
+    LogEntry:
+      type: object
+      properties:
+        ticket_id:
+          type: string
+        company:
+          type: string
+        request_type:
+          type: string
+        risk_level:
+          type: string
+        status:
+          type: string
+        confidence:
+          type: number
+        retrieved_docs:
+          type: array
+          items:
+            type: string
+        timestamp:
+          type: string
+      required:
+        - ticket_id
+        - company
+        - request_type
+        - risk_level
+        - status
+        - confidence
+        - retrieved_docs
+        - timestamp
+
+    TriageStatsResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        escalated:
+          type: integer
+        replied:
+          type: integer
+        by_company:
+          type: object
+          additionalProperties:
+            type: integer
+        by_request_type:
+          type: object
+          additionalProperties:
+            type: integer
+        by_risk_level:
+          type: object
+          additionalProperties:
+            type: integer
+        avg_confidence:
+          type: number
+      required:
+        - total
+        - escalated
+        - replied
+        - by_company
+        - by_request_type
+        - by_risk_level
+        - avg_confidence
+
+    CorpusDocumentBody:
+      type: object
+      properties:
+        source:
+          type: string
+        title:
+          type: string
+        content:
+          type: string
+        url:
+          type: string
+          nullable: true
+      required:
+        - source
+        - title
+        - content
+
+    CorpusDocumentResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        id:
+          type: string
+      required:
+        - success
+        - id
+
+    CorpusListResponse:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              source:
+                type: string
+              title:
+                type: string
+            required:
+              - id
+              - source
+              - title
+        total:
+          type: integer
+      required:
+        - documents
+        - total

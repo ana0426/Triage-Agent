@@ -8,3 +8,123 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface SupportTicket {
+  id: string;
+  subject: string;
+  issue: string;
+  company?: string | null;
+}
+
+export interface ProcessTicketsBody {
+  tickets: SupportTicket[];
+}
+
+export type TriageResultStatus =
+  (typeof TriageResultStatus)[keyof typeof TriageResultStatus];
+
+export const TriageResultStatus = {
+  replied: "replied",
+  escalated: "escalated",
+} as const;
+
+export type TriageResultRequestType =
+  (typeof TriageResultRequestType)[keyof typeof TriageResultRequestType];
+
+export const TriageResultRequestType = {
+  product_issue: "product_issue",
+  feature_request: "feature_request",
+  bug: "bug",
+  invalid: "invalid",
+} as const;
+
+export type TriageResultRiskLevel =
+  (typeof TriageResultRiskLevel)[keyof typeof TriageResultRiskLevel];
+
+export const TriageResultRiskLevel = {
+  low: "low",
+  medium: "medium",
+  high: "high",
+} as const;
+
+export interface TriageResult {
+  id: string;
+  subject: string;
+  issue: string;
+  company: string;
+  status: TriageResultStatus;
+  product_area: string;
+  request_type: TriageResultRequestType;
+  response: string;
+  justification: string;
+  confidence: number;
+  risk_level: TriageResultRiskLevel;
+  retrieved_docs: string[];
+  processed_at: string;
+}
+
+export interface ProcessTicketsResponse {
+  success: boolean;
+  processed: number;
+  results: TriageResult[];
+}
+
+export interface TriageResultsResponse {
+  results: TriageResult[];
+  total: number;
+}
+
+export interface LogEntry {
+  ticket_id: string;
+  company: string;
+  request_type: string;
+  risk_level: string;
+  status: string;
+  confidence: number;
+  retrieved_docs: string[];
+  timestamp: string;
+}
+
+export interface TriageLogsResponse {
+  log: string;
+  entries: LogEntry[];
+}
+
+export type TriageStatsResponseByCompany = { [key: string]: number };
+
+export type TriageStatsResponseByRequestType = { [key: string]: number };
+
+export type TriageStatsResponseByRiskLevel = { [key: string]: number };
+
+export interface TriageStatsResponse {
+  total: number;
+  escalated: number;
+  replied: number;
+  by_company: TriageStatsResponseByCompany;
+  by_request_type: TriageStatsResponseByRequestType;
+  by_risk_level: TriageStatsResponseByRiskLevel;
+  avg_confidence: number;
+}
+
+export interface CorpusDocumentBody {
+  source: string;
+  title: string;
+  content: string;
+  url?: string | null;
+}
+
+export interface CorpusDocumentResponse {
+  success: boolean;
+  id: string;
+}
+
+export type CorpusListResponseDocumentsItem = {
+  id: string;
+  source: string;
+  title: string;
+};
+
+export interface CorpusListResponse {
+  documents: CorpusListResponseDocumentsItem[];
+  total: number;
+}

@@ -14,3 +14,140 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Submit CSV tickets for triage processing
+ * @summary Process support tickets
+ */
+export const ProcessTicketsBody = zod.object({
+  tickets: zod.array(
+    zod.object({
+      id: zod.string(),
+      subject: zod.string(),
+      issue: zod.string(),
+      company: zod.string().nullish(),
+    }),
+  ),
+});
+
+export const ProcessTicketsResponse = zod.object({
+  success: zod.boolean(),
+  processed: zod.number(),
+  results: zod.array(
+    zod.object({
+      id: zod.string(),
+      subject: zod.string(),
+      issue: zod.string(),
+      company: zod.string(),
+      status: zod.enum(["replied", "escalated"]),
+      product_area: zod.string(),
+      request_type: zod.enum([
+        "product_issue",
+        "feature_request",
+        "bug",
+        "invalid",
+      ]),
+      response: zod.string(),
+      justification: zod.string(),
+      confidence: zod.number(),
+      risk_level: zod.enum(["low", "medium", "high"]),
+      retrieved_docs: zod.array(zod.string()),
+      processed_at: zod.string(),
+    }),
+  ),
+});
+
+/**
+ * Get all processed ticket results
+ * @summary Get triage results
+ */
+export const GetTriageResultsResponse = zod.object({
+  results: zod.array(
+    zod.object({
+      id: zod.string(),
+      subject: zod.string(),
+      issue: zod.string(),
+      company: zod.string(),
+      status: zod.enum(["replied", "escalated"]),
+      product_area: zod.string(),
+      request_type: zod.enum([
+        "product_issue",
+        "feature_request",
+        "bug",
+        "invalid",
+      ]),
+      response: zod.string(),
+      justification: zod.string(),
+      confidence: zod.number(),
+      risk_level: zod.enum(["low", "medium", "high"]),
+      retrieved_docs: zod.array(zod.string()),
+      processed_at: zod.string(),
+    }),
+  ),
+  total: zod.number(),
+});
+
+/**
+ * Get the triage processing log
+ * @summary Get triage logs
+ */
+export const GetTriageLogsResponse = zod.object({
+  log: zod.string(),
+  entries: zod.array(
+    zod.object({
+      ticket_id: zod.string(),
+      company: zod.string(),
+      request_type: zod.string(),
+      risk_level: zod.string(),
+      status: zod.string(),
+      confidence: zod.number(),
+      retrieved_docs: zod.array(zod.string()),
+      timestamp: zod.string(),
+    }),
+  ),
+});
+
+/**
+ * Get aggregate statistics about processed tickets
+ * @summary Get triage statistics
+ */
+export const GetTriageStatsResponse = zod.object({
+  total: zod.number(),
+  escalated: zod.number(),
+  replied: zod.number(),
+  by_company: zod.record(zod.string(), zod.number()),
+  by_request_type: zod.record(zod.string(), zod.number()),
+  by_risk_level: zod.record(zod.string(), zod.number()),
+  avg_confidence: zod.number(),
+});
+
+/**
+ * Add a document to the support corpus
+ * @summary Add corpus document
+ */
+export const AddCorpusDocumentBody = zod.object({
+  source: zod.string(),
+  title: zod.string(),
+  content: zod.string(),
+  url: zod.string().nullish(),
+});
+
+export const AddCorpusDocumentResponse = zod.object({
+  success: zod.boolean(),
+  id: zod.string(),
+});
+
+/**
+ * List all corpus documents
+ * @summary Get corpus documents
+ */
+export const GetCorpusResponse = zod.object({
+  documents: zod.array(
+    zod.object({
+      id: zod.string(),
+      source: zod.string(),
+      title: zod.string(),
+    }),
+  ),
+  total: zod.number(),
+});

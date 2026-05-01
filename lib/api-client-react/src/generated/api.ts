@@ -5,18 +5,31 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  CorpusDocumentBody,
+  CorpusDocumentResponse,
+  CorpusListResponse,
+  HealthStatus,
+  ProcessTicketsBody,
+  ProcessTicketsResponse,
+  TriageLogsResponse,
+  TriageResultsResponse,
+  TriageStatsResponse,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -92,6 +105,476 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Submit CSV tickets for triage processing
+ * @summary Process support tickets
+ */
+export const getProcessTicketsUrl = () => {
+  return `/api/triage/process`;
+};
+
+export const processTickets = async (
+  processTicketsBody: ProcessTicketsBody,
+  options?: RequestInit,
+): Promise<ProcessTicketsResponse> => {
+  return customFetch<ProcessTicketsResponse>(getProcessTicketsUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(processTicketsBody),
+  });
+};
+
+export const getProcessTicketsMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof processTickets>>,
+    TError,
+    { data: BodyType<ProcessTicketsBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof processTickets>>,
+  TError,
+  { data: BodyType<ProcessTicketsBody> },
+  TContext
+> => {
+  const mutationKey = ["processTickets"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof processTickets>>,
+    { data: BodyType<ProcessTicketsBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return processTickets(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ProcessTicketsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof processTickets>>
+>;
+export type ProcessTicketsMutationBody = BodyType<ProcessTicketsBody>;
+export type ProcessTicketsMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Process support tickets
+ */
+export const useProcessTickets = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof processTickets>>,
+    TError,
+    { data: BodyType<ProcessTicketsBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof processTickets>>,
+  TError,
+  { data: BodyType<ProcessTicketsBody> },
+  TContext
+> => {
+  return useMutation(getProcessTicketsMutationOptions(options));
+};
+
+/**
+ * Get all processed ticket results
+ * @summary Get triage results
+ */
+export const getGetTriageResultsUrl = () => {
+  return `/api/triage/results`;
+};
+
+export const getTriageResults = async (
+  options?: RequestInit,
+): Promise<TriageResultsResponse> => {
+  return customFetch<TriageResultsResponse>(getGetTriageResultsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetTriageResultsQueryKey = () => {
+  return [`/api/triage/results`] as const;
+};
+
+export const getGetTriageResultsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTriageResults>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTriageResults>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetTriageResultsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getTriageResults>>
+  > = ({ signal }) => getTriageResults({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTriageResults>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetTriageResultsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTriageResults>>
+>;
+export type GetTriageResultsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get triage results
+ */
+
+export function useGetTriageResults<
+  TData = Awaited<ReturnType<typeof getTriageResults>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTriageResults>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetTriageResultsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Get the triage processing log
+ * @summary Get triage logs
+ */
+export const getGetTriageLogsUrl = () => {
+  return `/api/triage/logs`;
+};
+
+export const getTriageLogs = async (
+  options?: RequestInit,
+): Promise<TriageLogsResponse> => {
+  return customFetch<TriageLogsResponse>(getGetTriageLogsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetTriageLogsQueryKey = () => {
+  return [`/api/triage/logs`] as const;
+};
+
+export const getGetTriageLogsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTriageLogs>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTriageLogs>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetTriageLogsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getTriageLogs>>> = ({
+    signal,
+  }) => getTriageLogs({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTriageLogs>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetTriageLogsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTriageLogs>>
+>;
+export type GetTriageLogsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get triage logs
+ */
+
+export function useGetTriageLogs<
+  TData = Awaited<ReturnType<typeof getTriageLogs>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTriageLogs>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetTriageLogsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Get aggregate statistics about processed tickets
+ * @summary Get triage statistics
+ */
+export const getGetTriageStatsUrl = () => {
+  return `/api/triage/stats`;
+};
+
+export const getTriageStats = async (
+  options?: RequestInit,
+): Promise<TriageStatsResponse> => {
+  return customFetch<TriageStatsResponse>(getGetTriageStatsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetTriageStatsQueryKey = () => {
+  return [`/api/triage/stats`] as const;
+};
+
+export const getGetTriageStatsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTriageStats>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTriageStats>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetTriageStatsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getTriageStats>>> = ({
+    signal,
+  }) => getTriageStats({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTriageStats>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetTriageStatsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTriageStats>>
+>;
+export type GetTriageStatsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get triage statistics
+ */
+
+export function useGetTriageStats<
+  TData = Awaited<ReturnType<typeof getTriageStats>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getTriageStats>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetTriageStatsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Add a document to the support corpus
+ * @summary Add corpus document
+ */
+export const getAddCorpusDocumentUrl = () => {
+  return `/api/triage/corpus`;
+};
+
+export const addCorpusDocument = async (
+  corpusDocumentBody: CorpusDocumentBody,
+  options?: RequestInit,
+): Promise<CorpusDocumentResponse> => {
+  return customFetch<CorpusDocumentResponse>(getAddCorpusDocumentUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(corpusDocumentBody),
+  });
+};
+
+export const getAddCorpusDocumentMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof addCorpusDocument>>,
+    TError,
+    { data: BodyType<CorpusDocumentBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof addCorpusDocument>>,
+  TError,
+  { data: BodyType<CorpusDocumentBody> },
+  TContext
+> => {
+  const mutationKey = ["addCorpusDocument"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof addCorpusDocument>>,
+    { data: BodyType<CorpusDocumentBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return addCorpusDocument(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AddCorpusDocumentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof addCorpusDocument>>
+>;
+export type AddCorpusDocumentMutationBody = BodyType<CorpusDocumentBody>;
+export type AddCorpusDocumentMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Add corpus document
+ */
+export const useAddCorpusDocument = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof addCorpusDocument>>,
+    TError,
+    { data: BodyType<CorpusDocumentBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof addCorpusDocument>>,
+  TError,
+  { data: BodyType<CorpusDocumentBody> },
+  TContext
+> => {
+  return useMutation(getAddCorpusDocumentMutationOptions(options));
+};
+
+/**
+ * List all corpus documents
+ * @summary Get corpus documents
+ */
+export const getGetCorpusUrl = () => {
+  return `/api/triage/corpus`;
+};
+
+export const getCorpus = async (
+  options?: RequestInit,
+): Promise<CorpusListResponse> => {
+  return customFetch<CorpusListResponse>(getGetCorpusUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetCorpusQueryKey = () => {
+  return [`/api/triage/corpus`] as const;
+};
+
+export const getGetCorpusQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCorpus>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getCorpus>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCorpusQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getCorpus>>> = ({
+    signal,
+  }) => getCorpus({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCorpus>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetCorpusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCorpus>>
+>;
+export type GetCorpusQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get corpus documents
+ */
+
+export function useGetCorpus<
+  TData = Awaited<ReturnType<typeof getCorpus>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getCorpus>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetCorpusQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
