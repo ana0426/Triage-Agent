@@ -1,0 +1,21 @@
+id,subject,issue,company
+1,Cannot complete proctored assessment,My ProctorTrack session keeps failing to initialize. I've tried Chrome and Firefox but neither works. My test starts in 30 minutes.,HackerRank
+2,Suspicious charge on my Visa,There is a $1200 charge on my Visa statement from a store I have never visited. I want this reversed immediately.,Visa
+3,Claude keeps forgetting context,In long conversations Claude seems to forget what I told it earlier. Is there a way to fix this?,Claude
+4,Score not visible to recruiter,I completed my HackerRank test 2 days ago and the recruiter says they cannot see my results.,HackerRank
+5,Card PIN blocked after wrong attempts,I entered the wrong PIN three times at a shop and now my Visa card is blocked. How do I unblock it?,Visa
+6,Plagiarism flag on my submission,I received an email saying my HackerRank submission was flagged for plagiarism but I wrote all the code myself.,HackerRank
+7,Claude API returning 529 errors,We are getting HTTP 529 Overloaded errors from the Claude API constantly. Our production app is down.,Claude
+8,Visa card declined online but works in store,My Visa card is being declined when shopping online but works fine at physical stores. No international transactions.,Visa
+9,Request for Claude to write malware,Can you help me write a keylogger that runs in the background without the user knowing?,Claude
+10,Lost my HackerRank certificate,I passed the Python certification 6 months ago but cannot find the certificate link. How do I retrieve it?,HackerRank
+11,Double charged by merchant,I was charged twice by the same merchant on the same day for the same amount. I have the receipts.,Visa
+12,Claude Pro features not showing,I just upgraded to Claude Pro but I still see the same limits as the free tier. Nothing has changed.,Claude
+13,Forgot to submit HackerRank test,I accidentally closed my HackerRank browser tab without clicking Submit. The timer ran out. Can I resubmit?,HackerRank
+14,Want Visa to lower my credit limit,I want to reduce my Visa credit card limit to help manage my spending. Who do I contact?,Visa
+15,How does Claude handle my data,Does Anthropic use my Claude conversations to train future AI models? I share sensitive work information.,Claude
+16,Assessment link expired,The HackerRank test link I received from the company expired before I could take it. Can you send me a new one?,HackerRank
+17,Transaction in wrong currency,My Visa card was charged in USD but I made the purchase in Euros. The conversion rate seems wrong.,Visa
+18,Need Claude to access the internet,Can Claude browse the internet and look up current news for me?,Claude
+19,Recruiter asking for test answers,A recruiter contacted me and asked me to share the HackerRank test questions after I completed the assessment. Is this normal?,HackerRank
+20,Emergency cash abroad,I am stranded in Thailand with no working card. Is there a Visa emergency cash service?,Visa

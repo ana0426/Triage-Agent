@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
 """
-AI Support Triage Agent
-Terminal-based agent for processing support tickets through a RAG pipeline.
+AI Support Triage Agent — HackerRank Orchestrate (May 2026)
+
+Entry point: reads support_tickets/support_tickets.csv, runs the RAG-based
+triage pipeline, and writes predictions to support_tickets/output.csv.
+
+Usage:
+    python main.py                          # uses default support_tickets.csv
+    python main.py --input /path/to/in.csv  # custom input file
+    python main.py --sample                 # run on sample_support_tickets.csv
+
+Logs:
+    $HOME/hackerrank_orchestrate/log.txt    # AGENTS.md §2 transcript log
+    $HOME/hackerrank_orchestrate/triage_run.txt  # per-ticket decision trace
 """
 import sys
 import json
@@ -16,8 +27,6 @@ try:
     from rich.console import Console
     from rich.panel import Panel
     from rich.table import Table
-    from rich.progress import Progress, SpinnerColumn, TextColumn
-    from rich import print as rprint
     HAS_RICH = True
 except ImportError:
     HAS_RICH = False
@@ -25,75 +34,77 @@ except ImportError:
 sys.path.insert(0, os.path.dirname(__file__))
 
 from config import (
-    TOP_K_RETRIEVAL, CONFIDENCE_THRESHOLD, OUTPUT_CSV
+    TOP_K_RETRIEVAL, CONFIDENCE_THRESHOLD, OUTPUT_CSV, INPUT_CSV, DATA_DIR
 )
 from ingest import load_corpus, chunk_documents
 from retrieval import HybridRetriever
 from classifier import detect_company, classify_request_type, classify_product_area
 from risk_engine import assess_risk, should_escalate
 from responder import generate_response
-from utils import preprocess_text, contains_prompt_injection, write_log, clear_log
-
+from utils import (
+    preprocess_text, contains_prompt_injection,
+    write_log, clear_log,
+    write_session_start, write_turn_log,
+)
 
 console = Console() if HAS_RICH else None
+
+
+def _print(msg: str, style: str = ""):
+    if HAS_RICH and console:
+        console.print(msg, style=style or None)
+    else:
+        print(msg)
 
 
 def print_ticket_header(ticket_num: int, total: int, subject: str):
     if HAS_RICH:
         console.print(Panel(
-            f"[bold cyan]PROCESSING TICKET #{ticket_num}/{total}[/bold cyan]\n"
-            f"[white]{subject}[/white]",
-            border_style="cyan"
+            f"[bold cyan]TICKET {ticket_num}/{total}[/bold cyan]  [white]{subject}[/white]",
+            border_style="cyan",
         ))
     else:
-        print(f"\n{'='*60}")
-        print(f"PROCESSING TICKET #{ticket_num}/{total}")
-        print(f"Subject: {subject}")
-        print('='*60)
+        print(f"\n{'='*60}\nPROCESSING TICKET {ticket_num}/{total}: {subject}\n{'='*60}")
 
 
 def print_result(result: dict):
     status_color = "red" if result["status"] == "escalated" else "green"
-    risk_color = "red" if result["risk_level"] == "high" else ("yellow" if result["risk_level"] == "medium" else "green")
-
+    risk_color = "red" if result["risk_level"] == "high" else (
+        "yellow" if result["risk_level"] == "medium" else "green"
+    )
     if HAS_RICH:
-        table = Table(show_header=False, box=None, padding=(0, 1))
-        table.add_column("Key", style="bold")
-        table.add_column("Value")
-        table.add_row("Company:", result["company"])
-        table.add_row("Request Type:", result["request_type"])
-        table.add_row("Product Area:", result["product_area"])
-        table.add_row("Risk Level:", f"[{risk_color}]{result['risk_level'].upper()}[/{risk_color}]")
-        table.add_row("Confidence:", f"{result['confidence']:.2f}")
-        table.add_row("Decision:", f"[{status_color}]{result['status'].upper()}[/{status_color}]")
-        table.add_row("Top Docs:", ", ".join(result["retrieved_docs"][:3]))
-        console.print(table)
-        console.print(f"\n[italic]{result['response'][:200]}...[/italic]\n" if len(result['response']) > 200 else f"\n[italic]{result['response']}[/italic]\n")
+        t = Table(show_header=False, box=None, padding=(0, 1))
+        t.add_column("Key", style="bold")
+        t.add_column("Value")
+        t.add_row("Company:", result["company"])
+        t.add_row("Request Type:", result["request_type"])
+        t.add_row("Product Area:", result["product_area"])
+        t.add_row("Risk:", f"[{risk_color}]{result['risk_level'].upper()}[/{risk_color}]")
+        t.add_row("Confidence:", f"{result['confidence']:.2f}")
+        t.add_row("Decision:", f"[{status_color}]{result['status'].upper()}[/{status_color}]")
+        console.print(t)
+        preview = result["response"][:180] + "…" if len(result["response"]) > 180 else result["response"]
+        console.print(f"[italic]{preview}[/italic]\n")
     else:
-        print(f"Company:      {result['company']}")
-        print(f"Request Type: {result['request_type']}")
-        print(f"Product Area: {result['product_area']}")
-        print(f"Risk Level:   {result['risk_level'].upper()}")
-        print(f"Confidence:   {result['confidence']:.2f}")
-        print(f"Decision:     {result['status'].upper()}")
-        print(f"Top Docs:     {', '.join(result['retrieved_docs'][:3])}")
-        print(f"Response:     {result['response'][:150]}...")
+        print(f"  Company:    {result['company']}")
+        print(f"  Type:       {result['request_type']}")
+        print(f"  Area:       {result['product_area']}")
+        print(f"  Risk:       {result['risk_level'].upper()}")
+        print(f"  Confidence: {result['confidence']:.2f}")
+        print(f"  Decision:   {result['status'].upper()}")
+        print(f"  Response:   {result['response'][:120]}…")
 
 
-def process_ticket(
-    ticket: dict,
-    retriever: HybridRetriever,
-) -> dict:
+def process_ticket(ticket: dict, retriever: HybridRetriever) -> dict:
     ticket_id = str(ticket.get("id", "unknown"))
     subject = ticket.get("subject", "")
     issue = ticket.get("issue", "")
-    provided_company = ticket.get("company")
+    provided_company = ticket.get("company") or None
 
     full_text = f"{subject} {issue}"
     processed_text = preprocess_text(full_text)
 
-    is_injection = contains_prompt_injection(full_text)
-    if is_injection:
+    if contains_prompt_injection(full_text):
         return {
             "id": ticket_id,
             "subject": subject,
@@ -131,9 +142,7 @@ def process_ticket(
         }
 
     retrieved_docs, confidence = retriever.retrieve(
-        processed_text,
-        company=company,
-        top_k=TOP_K_RETRIEVAL
+        processed_text, company=company, top_k=TOP_K_RETRIEVAL
     )
 
     risk_level, escalation_reasons = assess_risk(processed_text, confidence)
@@ -177,17 +186,16 @@ def process_ticket(
 
 
 def write_output_csv(results: List[dict]):
-    Path(OUTPUT_CSV).parent.mkdir(parents=True, exist_ok=True)
-    fieldnames = ["id", "subject", "issue", "company", "status", "product_area",
-                  "request_type", "response", "justification", "confidence",
-                  "risk_level", "processed_at"]
-    with open(OUTPUT_CSV, "w", newline="", encoding="utf-8") as f:
+    """Write output in the exact schema required by the evaluator."""
+    out_path = Path(OUTPUT_CSV)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    fieldnames = ["id", "status", "product_area", "response", "justification", "request_type"]
+    with open(out_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         for result in results:
-            row = {k: result.get(k, "") for k in fieldnames}
-            row["retrieved_docs"] = ""
-            writer.writerow(row)
+            writer.writerow({k: result.get(k, "") for k in fieldnames})
+    _print(f"\n[bold green]Output written:[/bold green] {out_path}" if HAS_RICH else f"\nOutput: {out_path}")
 
 
 def run_pipeline(tickets: List[dict]) -> List[dict]:
@@ -200,32 +208,34 @@ def run_pipeline(tickets: List[dict]) -> List[dict]:
     if HAS_RICH:
         console.print(Panel(
             f"[bold green]AI Support Triage Agent[/bold green]\n"
-            f"Corpus: {len(corpus)} documents | {len(chunks)} chunks\n"
+            f"Corpus: {len(corpus)} docs | {len(chunks)} chunks | "
+            f"Data dir: {DATA_DIR}\n"
             f"Tickets to process: {len(tickets)}",
             title="Starting",
-            border_style="green"
+            border_style="green",
         ))
+    else:
+        print(f"\nLoaded {len(corpus)} docs ({len(chunks)} chunks). Processing {len(tickets)} tickets…")
 
     results = []
-    total = len(tickets)
-
     for i, ticket in enumerate(tickets, 1):
-        print_ticket_header(i, total, ticket.get("subject", "Unknown"))
+        print_ticket_header(i, len(tickets), ticket.get("subject", "Unknown"))
         result = process_ticket(ticket, retriever)
         results.append(result)
         print_result(result)
 
     write_output_csv(results)
 
+    escalated = sum(1 for r in results if r["status"] == "escalated")
+    replied = len(results) - escalated
     if HAS_RICH:
-        escalated = sum(1 for r in results if r["status"] == "escalated")
-        replied = len(results) - escalated
         console.print(Panel(
-            f"[green]Replied:[/green] {replied}  [red]Escalated:[/red] {escalated}  Total: {len(results)}\n"
-            f"Output: {OUTPUT_CSV}",
-            title="[bold green]Processing Complete[/bold green]",
-            border_style="green"
+            f"[green]Replied:[/green] {replied}   [red]Escalated:[/red] {escalated}   Total: {len(results)}",
+            title="[bold green]Complete[/bold green]",
+            border_style="green",
         ))
+    else:
+        print(f"\nDone — Replied: {replied} | Escalated: {escalated} | Total: {len(results)}")
 
     return results
 
@@ -235,40 +245,67 @@ def load_tickets_from_csv(csv_path: str) -> List[dict]:
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for i, row in enumerate(reader):
-            ticket = {
+            tickets.append({
                 "id": row.get("id", str(i + 1)),
                 "subject": row.get("subject", ""),
                 "issue": row.get("issue", ""),
-                "company": row.get("company", ""),
-            }
-            tickets.append(ticket)
+                "company": row.get("company", "") or None,
+            })
     return tickets
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="AI Support Triage Agent")
+    parser = argparse.ArgumentParser(
+        description="AI Support Triage Agent — HackerRank Orchestrate May 2026"
+    )
     parser.add_argument(
         "--input", "-i",
-        default=os.path.join(os.path.dirname(__file__), "..", "support_issues", "support_tickets.csv"),
-        help="Input CSV file path"
+        default=str(INPUT_CSV),
+        help="Path to input CSV (default: support_tickets/support_tickets.csv)",
+    )
+    parser.add_argument(
+        "--sample", "-s",
+        action="store_true",
+        help="Run on sample_support_tickets.csv instead",
     )
     parser.add_argument(
         "--json-input", "-j",
-        help="JSON input (list of tickets)"
+        help="JSON string containing a list of ticket dicts",
     )
     args = parser.parse_args()
+
+    if args.sample:
+        args.input = str(Path(INPUT_CSV).parent / "sample_support_tickets.csv")
 
     if args.json_input:
         tickets = json.loads(args.json_input)
     else:
         if not os.path.exists(args.input):
-            print(f"Error: Input file not found: {args.input}")
+            print(f"Error: Input file not found: {args.input}", file=sys.stderr)
             sys.exit(1)
         tickets = load_tickets_from_csv(args.input)
 
     if not tickets:
-        print("No tickets to process.")
+        print("No tickets to process.", file=sys.stderr)
         sys.exit(0)
 
+    write_session_start(args.input, len(tickets))
+
     results = run_pipeline(tickets)
-    print(json.dumps(results, indent=2))
+
+    write_turn_log(
+        title="Triage pipeline run complete",
+        prompt_summary=f"Run pipeline on {args.input} ({len(tickets)} tickets)",
+        response_summary=(
+            f"Processed {len(tickets)} tickets. "
+            f"Replied: {sum(1 for r in results if r['status']=='replied')}. "
+            f"Escalated: {sum(1 for r in results if r['status']=='escalated')}. "
+            f"Output written to support_tickets/output.csv."
+        ),
+        actions=[
+            f"read {args.input}",
+            f"loaded corpus from {DATA_DIR}",
+            "ran RAG retrieval + LLM response generation",
+            f"wrote support_tickets/output.csv ({len(results)} rows)",
+        ],
+    )
