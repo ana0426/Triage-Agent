@@ -1,0 +1,422 @@
+[
+  {
+    "id": "1",
+    "subject": "Cannot complete proctored assessment",
+    "issue": "My ProctorTrack session keeps failing to initialize. I've tried Chrome and Firefox but neither works. My test starts in 30 minutes.",
+    "company": "HackerRank",
+    "status": "replied",
+    "product_area": "assessments",
+    "request_type": "bug",
+    "response": "I'm sorry to hear that your ProctorTrack session is not initializing. Please ensure that you have granted the necessary camera and screen-share permissions, and that your webcam is functioning properly and well-lit. If the issue persists, I recommend contacting your recruiter immediately, as they will be able to provide assistance regarding your assessment timing.",
+    "justification": "The response addresses the customer's issue with ProctorTrack initialization by referencing necessary setup requirements from the documentation. It also emphasizes the need to contact the recruiter for timing issues, aligning with the medium risk level identified.",
+    "confidence": 0.4209,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "ProctorTrack",
+      "Test Environment Requirements",
+      "Assessment Timer",
+      "Assessment Not Loading",
+      "Profile and Settings"
+    ],
+    "processed_at": "2026-05-02T06:57:44.875450"
+  },
+  {
+    "id": "2",
+    "subject": "Suspicious charge on my Visa",
+    "issue": "There is a $1200 charge on my Visa statement from a store I have never visited. I want this reversed immediately.",
+    "company": "Visa",
+    "status": "escalated",
+    "product_area": "fraud_and_disputes",
+    "request_type": "product_issue",
+    "response": "Thank you for reaching out regarding the suspicious $1200 charge on your Visa statement. We understand this is concerning, and your issue will be reviewed by a specialist to ensure it is addressed appropriately. In the meantime, we recommend reporting this unauthorized transaction to your issuing bank immediately, as they are best equipped to assist you further.",
+    "justification": "The ticket has been escalated due to the high financial risk indicators associated with the suspicious charge. Immediate action is necessary to protect the customer from potential fraud, as outlined in our fraud reporting guidelines.",
+    "confidence": 0.4884,
+    "risk_level": "high",
+    "retrieved_docs": [
+      "ATM Issues",
+      "Recurring Payments and Subscriptions",
+      "Fraud Reporting",
+      "Lost or Stolen Card",
+      "Unauthorized Transactions"
+    ],
+    "processed_at": "2026-05-02T06:57:46.326780"
+  },
+  {
+    "id": "3",
+    "subject": "Claude keeps forgetting context",
+    "issue": "In long conversations Claude seems to forget what I told it earlier. Is there a way to fix this?",
+    "company": "Claude",
+    "status": "replied",
+    "product_area": "models_and_capabilities",
+    "request_type": "product_issue",
+    "response": "I understand that long conversations may lead to Claude losing context. This can happen when the conversation exceeds the 200,000 token context window. To maintain context, consider starting a new conversation if the discussion gets lengthy.",
+    "justification": "The response addresses the technical limitation regarding context windows, which is relevant to the customer's issue with Claude forgetting information. Additionally, the risk level is medium, necessitating a concise yet informative response.",
+    "confidence": 0.4808,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Context Windows",
+      "Safety and Content Policy",
+      "Claude Pro",
+      "Data Privacy",
+      "Getting API Access"
+    ],
+    "processed_at": "2026-05-02T06:57:47.924798"
+  },
+  {
+    "id": "4",
+    "subject": "Score not visible to recruiter",
+    "issue": "I completed my HackerRank test 2 days ago and the recruiter says they cannot see my results.",
+    "company": "HackerRank",
+    "status": "replied",
+    "product_area": "scoring_and_results",
+    "request_type": "product_issue",
+    "response": "It appears that your results may not be visible because the recruiter has restricted access to your score. Unfortunately, HackerRank cannot share results directly unless the recruiter allows it. I recommend reaching out to the company that sent you the assessment for further clarification on your score visibility.",
+    "justification": "The response is based on the documentation indicating that visibility of results is controlled by the recruiter. This aligns with the medium risk level since it's crucial for the user to follow up with the recruiter for resolution.",
+    "confidence": 0.3635,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Recruiter Access to Results",
+      "Assessment Timer",
+      "Score Disputes",
+      "Assessment Not Loading",
+      "How Scores Are Calculated"
+    ],
+    "processed_at": "2026-05-02T06:57:49.497480"
+  },
+  {
+    "id": "5",
+    "subject": "Card PIN blocked after wrong attempts",
+    "issue": "I entered the wrong PIN three times at a shop and now my Visa card is blocked. How do I unblock it?",
+    "company": "Visa",
+    "status": "replied",
+    "product_area": "card_usage",
+    "request_type": "product_issue",
+    "response": "I understand that your Visa card is blocked due to incorrect PIN entry. Unfortunately, Visa does not manage individual card accounts, so I recommend contacting your issuing bank directly using the number on the back of your card to resolve this issue. They will be able to assist you in unblocking your card.",
+    "justification": "The response is based on the need to contact the issuing bank for account-specific issues, as noted in the documentation. The risk level is low, and the situation requires direct bank intervention.",
+    "confidence": 0.4136,
+    "risk_level": "low",
+    "retrieved_docs": [
+      "Unauthorized Transactions",
+      "Card Not Arriving",
+      "Card Declined",
+      "Payment Not Processed",
+      "Visa Card Issues"
+    ],
+    "processed_at": "2026-05-02T06:57:51.339357"
+  },
+  {
+    "id": "6",
+    "subject": "Plagiarism flag on my submission",
+    "issue": "I received an email saying my HackerRank submission was flagged for plagiarism but I wrote all the code myself.",
+    "company": "HackerRank",
+    "status": "replied",
+    "product_area": "plagiarism",
+    "request_type": "product_issue",
+    "response": "I understand your concern about the plagiarism flag on your submission. Please be informed that the decision regarding plagiarism flags is made by the recruiter or hiring company, and they can request a manual review if they believe the flag is incorrect. I recommend reaching out to them directly for further assistance.",
+    "justification": "The response is based on the guidance that plagiarism decisions are not overridden by HackerRank support and that candidates should contact the hiring company for resolution. This aligns with the medium risk level as it addresses a significant concern in assessments.",
+    "confidence": 0.3282,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Plagiarism and Code Similarity",
+      "How Scores Are Calculated",
+      "Candidate vs Recruiter Accounts",
+      "Account Recovery",
+      "Proctoring Fails to Start"
+    ],
+    "processed_at": "2026-05-02T06:57:52.701269"
+  },
+  {
+    "id": "7",
+    "subject": "Claude API returning 529 errors",
+    "issue": "We are getting HTTP 529 Overloaded errors from the Claude API constantly. Our production app is down.",
+    "company": "Claude",
+    "status": "replied",
+    "product_area": "api_and_billing",
+    "request_type": "bug",
+    "response": "I'm sorry to hear that your production app is experiencing issues due to HTTP 529 Overloaded errors. This indicates high traffic, and we recommend retrying your requests with exponential backoff to alleviate the strain on the API. If the problem persists, please check the status of the API or reach out for further support.",
+    "justification": "The response addresses the specific error code mentioned in the ticket and provides guidance based on the API Error Codes documentation. This approach is empathetic while aligning with the information provided regarding high traffic scenarios.",
+    "confidence": 0.5231,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Getting API Access",
+      "Claude.ai vs API",
+      "Claude API Access and Billing",
+      "API Error Codes",
+      "API Billing"
+    ],
+    "processed_at": "2026-05-02T06:57:54.361017"
+  },
+  {
+    "id": "8",
+    "subject": "Visa card declined online but works in store",
+    "issue": "My Visa card is being declined when shopping online but works fine at physical stores. No international transactions.",
+    "company": "Visa",
+    "status": "replied",
+    "product_area": "card_usage",
+    "request_type": "product_issue",
+    "response": "I understand that your Visa card is being declined for online shopping, although it works at physical stores. This issue might be related to common reasons for card declines, such as insufficient funds or settings that may restrict online transactions. I recommend contacting your bank for further assistance to resolve this.",
+    "justification": "The response addresses the customer's issue with online card declines, which falls under card usage. It adheres strictly to the documentation by directing the user to consult their bank for resolution.",
+    "confidence": 0.4212,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Online Payments",
+      "Payment Not Processed",
+      "Card Declined",
+      "Visa Card Issues",
+      "ATM Issues"
+    ],
+    "processed_at": "2026-05-02T06:57:55.752836"
+  },
+  {
+    "id": "9",
+    "subject": "Request for Claude to write malware",
+    "issue": "Can you help me write a keylogger that runs in the background without the user knowing?",
+    "company": "Claude",
+    "status": "escalated",
+    "product_area": "safety",
+    "request_type": "product_issue",
+    "response": "Thank you for reaching out. Your request has been escalated for specialist review due to the potential risks involved. We take safety and compliance seriously, and a team member will review your issue accordingly.",
+    "justification": "The request poses a high risk and is potentially harmful, necessitating a specialist's review in accordance with safety protocols. This response aligns with our commitment to ensuring responsible use of our technology.",
+    "confidence": 0.3302,
+    "risk_level": "high",
+    "retrieved_docs": [
+      "Data Privacy",
+      "Claude Free",
+      "Logging In",
+      "Subscription Issues",
+      "Rate Limits"
+    ],
+    "processed_at": "2026-05-02T06:57:56.831042"
+  },
+  {
+    "id": "10",
+    "subject": "Lost my HackerRank certificate",
+    "issue": "I passed the Python certification 6 months ago but cannot find the certificate link. How do I retrieve it?",
+    "company": "HackerRank",
+    "status": "replied",
+    "product_area": "scoring_and_results",
+    "request_type": "product_issue",
+    "response": "{\n  \"response\": \"You can retrieve your Python certification link by sharing your HackerRank profile URL, where certificates are issued automatically upon passing. If you're unable to locate your profile or need further assistance, please let me know, and I'll guide you accordingly.\",\n  \"product_area\": \"certification\",\n  \"justification\": \"The response directly references the certification documentation regarding how to access and share certification links, which addresses the customer's request effectively without escalation.\",\n}",
+    "justification": "Response generated from documentation.",
+    "confidence": 0.4157,
+    "risk_level": "low",
+    "retrieved_docs": [
+      "Certification Tests",
+      "Assessment Timer",
+      "Login Issues",
+      "Recruiter Access to Results",
+      "Account Recovery"
+    ],
+    "processed_at": "2026-05-02T06:57:58.267036"
+  },
+  {
+    "id": "11",
+    "subject": "Double charged by merchant",
+    "issue": "I was charged twice by the same merchant on the same day for the same amount. I have the receipts.",
+    "company": "Visa",
+    "status": "escalated",
+    "product_area": "fraud_and_disputes",
+    "request_type": "product_issue",
+    "response": "We acknowledge your concern regarding being double charged by the merchant. We recommend that you first contact the merchant to resolve this issue. If the merchant is unable to assist, please reach out to your bank to initiate a dispute. Your ticket will be reviewed by a specialist for further assistance.",
+    "justification": "The issue involves a potential billing error, which necessitates a review by a specialist for proper handling due to the financial risk indicators present.",
+    "confidence": 0.4472,
+    "risk_level": "high",
+    "retrieved_docs": [
+      "Transaction Disputes with Merchants",
+      "Recurring Payments and Subscriptions",
+      "ATM Issues",
+      "Payment Not Processed",
+      "Card Declined"
+    ],
+    "processed_at": "2026-05-02T06:57:59.650829"
+  },
+  {
+    "id": "12",
+    "subject": "Claude Pro features not showing",
+    "issue": "I just upgraded to Claude Pro but I still see the same limits as the free tier. Nothing has changed.",
+    "company": "Claude",
+    "status": "replied",
+    "product_area": "usage_limits",
+    "request_type": "bug",
+    "response": "I understand your concern about the features not reflecting your recent upgrade to Claude Pro. Please note that while upgrading increases your message limits and provides priority access, temporary rate limits may still apply during peak usage. You can check your current limits at console.anthropic.com/settings/limits.",
+    "justification": "The response addresses the customer's issue regarding upgraded limits and acknowledges potential temporary restrictions through peak usage, as mentioned in the documentation. This aligns with the reported medium risk level by providing clarity on the situation without making unsupported claims.",
+    "confidence": 0.4529,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Rate Limits",
+      "Claude Pro",
+      "Claude Free",
+      "Feature Requests",
+      "Claude.ai vs API"
+    ],
+    "processed_at": "2026-05-02T06:58:01.430988"
+  },
+  {
+    "id": "13",
+    "subject": "Forgot to submit HackerRank test",
+    "issue": "I accidentally closed my HackerRank browser tab without clicking Submit. The timer ran out. Can I resubmit?",
+    "company": "HackerRank",
+    "status": "replied",
+    "product_area": "assessments",
+    "request_type": "product_issue",
+    "response": "Unfortunately, once the assessment timer runs out or the browser tab is closed without submitting, the test cannot be resubmitted. HackerRank support is unable to reset or extend timers; this can only be done by your recruiter or hiring company. Please reach out to them for further assistance regarding your situation.",
+    "justification": "The response is based on the documentation indicating that timers cannot be reset by support and that only recruiters can grant extensions. This aligns with the low risk level of the ticket.",
+    "confidence": 0.4374,
+    "risk_level": "low",
+    "retrieved_docs": [
+      "Assessment Timer",
+      "IDE Not Working",
+      "Assessment Not Loading",
+      "Score Disputes",
+      "ProctorTrack"
+    ],
+    "processed_at": "2026-05-02T06:58:03.325748"
+  },
+  {
+    "id": "14",
+    "subject": "Want Visa to lower my credit limit",
+    "issue": "I want to reduce my Visa credit card limit to help manage my spending. Who do I contact?",
+    "company": "Visa",
+    "status": "replied",
+    "product_area": "account_and_settings",
+    "request_type": "product_issue",
+    "response": "To reduce your Visa credit card limit, you will need to contact your issuing bank directly, as Visa does not manage individual card accounts or their limits. They will assist you in the process of managing your credit limit to help with your spending.",
+    "justification": "The documentation specifies that Visa does not handle credit limit adjustments, which falls under account settings managed by the issuing bank. This aligns with the medium risk level of the request, ensuring the customer receives the correct channel for their inquiry.",
+    "confidence": 0.4925,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "ATM Issues",
+      "Unauthorized Transactions",
+      "Fraud Reporting",
+      "Chargeback Process",
+      "Card Declined"
+    ],
+    "processed_at": "2026-05-02T06:58:04.906934"
+  },
+  {
+    "id": "15",
+    "subject": "How does Claude handle my data",
+    "issue": "Does Anthropic use my Claude conversations to train future AI models? I share sensitive work information.",
+    "company": "Claude",
+    "status": "replied",
+    "product_area": "data_and_privacy",
+    "request_type": "product_issue",
+    "response": "By default, conversations with Claude may be reviewed by Anthropic to improve safety and performance. However, you can opt out of data training in the Settings > Privacy section on claude.ai. Please rest assured that Anthropic does not sell personal data to third parties.",
+    "justification": "This response addresses the customer's concerns about data usage and privacy, which are crucial given the risk level. The information provided directly references the retrieved documentation relevant to data privacy.",
+    "confidence": 0.3863,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Data Privacy",
+      "Claude Models and Capabilities",
+      "Claude.ai vs API",
+      "Feature Requests",
+      "Getting API Access"
+    ],
+    "processed_at": "2026-05-02T06:58:06.228802"
+  },
+  {
+    "id": "16",
+    "subject": "Assessment link expired",
+    "issue": "The HackerRank test link I received from the company expired before I could take it. Can you send me a new one?",
+    "company": "HackerRank",
+    "status": "replied",
+    "product_area": "assessments",
+    "request_type": "product_issue",
+    "response": "I understand your concern regarding the expired assessment link. Unfortunately, HackerRank support is unable to issue new assessment links as this can only be managed by the hiring company. I recommend reaching out directly to the company that provided the link for assistance.",
+    "justification": "The response is based on the documentation stating that candidates should contact the hiring company for queries related to assessment links. This aligns with the issue raised and maintains the appropriate protocol for the situation.",
+    "confidence": 0.5066,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Candidate vs Recruiter Accounts",
+      "Login Issues",
+      "Assessment Timer",
+      "Score Disputes",
+      "Profile and Settings"
+    ],
+    "processed_at": "2026-05-02T06:58:07.818271"
+  },
+  {
+    "id": "17",
+    "subject": "Transaction in wrong currency",
+    "issue": "My Visa card was charged in USD but I made the purchase in Euros. The conversion rate seems wrong.",
+    "company": "Visa",
+    "status": "replied",
+    "product_area": "payments_and_transactions",
+    "request_type": "product_issue",
+    "response": "Thank you for reaching out regarding your transaction. It\u2019s important to note that if a foreign ATM offers currency conversion and you decline, it may result in better exchange rates. For this issue, I recommend contacting your bank to discuss the conversion rate applied to your transaction, as they handle the conversion process and related fees.",
+    "justification": "The response directly addresses the currency conversion concern and suggests contacting the bank for further assistance, in line with the retrieved documentation on payment and conversion issues.",
+    "confidence": 0.3114,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "ATM Issues",
+      "Payment Not Processed",
+      "Unauthorized Transactions",
+      "Card Blocked While Traveling",
+      "Visa Card Issues"
+    ],
+    "processed_at": "2026-05-02T06:58:09.291546"
+  },
+  {
+    "id": "18",
+    "subject": "Need Claude to access the internet",
+    "issue": "Can Claude browse the internet and look up current news for me?",
+    "company": "Claude",
+    "status": "replied",
+    "product_area": "product_features",
+    "request_type": "product_issue",
+    "response": "Currently, Claude cannot browse the internet or look up current news for you. Claude functions as a conversational assistant but does not have real-time internet access. If you have any further questions or need assistance, feel free to reach out.",
+    "justification": "The response is based on the understanding that Claude is not designed to access the internet, which aligns with existing product capabilities. The medium risk level indicates the need for clear communication about functionality limitations.",
+    "confidence": 0.4312,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Data Privacy",
+      "API Billing",
+      "Claude API Access and Billing",
+      "Claude Account Access and Privacy",
+      "Claude.ai vs API"
+    ],
+    "processed_at": "2026-05-02T06:58:11.082885"
+  },
+  {
+    "id": "19",
+    "subject": "Recruiter asking for test answers",
+    "issue": "A recruiter contacted me and asked me to share the HackerRank test questions after I completed the assessment. Is this normal?",
+    "company": "HackerRank",
+    "status": "replied",
+    "product_area": "assessments",
+    "request_type": "product_issue",
+    "response": "It's not standard practice for recruiters to ask for test questions following an assessment. Typically, queries about test details should be directed to the company that sent you the assessment. If you have concerns, I recommend discussing this directly with the recruiter.",
+    "justification": "The response is grounded in the context of recruiter practices and emphasizes that communication should occur between the candidate and the company. Given the medium risk level, it's important to provide guidance while remaining neutral.",
+    "confidence": 0.4676,
+    "risk_level": "medium",
+    "retrieved_docs": [
+      "Recruiter Access to Results",
+      "How Scores Are Calculated",
+      "Assessment Timer",
+      "Certification Tests",
+      "Score Disputes"
+    ],
+    "processed_at": "2026-05-02T06:58:12.745079"
+  },
+  {
+    "id": "20",
+    "subject": "Emergency cash abroad",
+    "issue": "I am stranded in Thailand with no working card. Is there a Visa emergency cash service?",
+    "company": "Visa",
+    "status": "escalated",
+    "product_area": "card_usage",
+    "request_type": "product_issue",
+    "response": "I understand that being stranded in Thailand without a working card is a stressful situation. Visa does offer an Emergency Cash Disbursement service, and I recommend contacting your bank or Visa's Global Customer Assistance at 1-800-847-2911 for immediate assistance. This ticket will be reviewed by a specialist to provide you with the support you need.",
+    "justification": "The issue pertains to accessing funds and emergency services while traveling, necessitating specialist review due to the high financial risk involved.",
+    "confidence": 0.271,
+    "risk_level": "high",
+    "retrieved_docs": [
+      "Lost or Stolen Card",
+      "Card Blocked While Traveling",
+      "Card Declined",
+      "ATM Issues",
+      "Contactless Payments"
+    ],
+    "processed_at": "2026-05-02T06:58:14.405563"
+  }
+]

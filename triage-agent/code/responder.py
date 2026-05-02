@@ -4,9 +4,9 @@ from openai import OpenAI
 from config import OPENAI_BASE_URL, OPENAI_API_KEY, LLM_MODEL, MAX_TOKENS
 from prompts import (
     TRIAGE_SYSTEM_PROMPT,
-    TRIAGE_USER_PROMPT,
+    build_user_prompt,
     ESCALATION_NOTE_TEMPLATE,
-    SAFE_REPLY_NOTE
+    SAFE_REPLY_NOTE,
 )
 
 
@@ -33,7 +33,6 @@ def generate_response(
 ) -> Tuple[str, str, str]:
     context = build_context(retrieved_docs)
 
-    escalation_note = ""
     if status == "escalated" and escalation_reasons:
         escalation_note = ESCALATION_NOTE_TEMPLATE.format(
             reasons="; ".join(escalation_reasons)
@@ -41,7 +40,7 @@ def generate_response(
     else:
         escalation_note = SAFE_REPLY_NOTE
 
-    user_prompt = TRIAGE_USER_PROMPT.format(
+    user_prompt = build_user_prompt(
         context=context,
         subject=subject,
         issue=issue,
@@ -49,7 +48,7 @@ def generate_response(
         request_type=request_type,
         status=status,
         risk_level=risk_level,
-        escalation_note=escalation_note
+        escalation_note=escalation_note,
     )
 
     try:
@@ -75,7 +74,7 @@ def generate_response(
         return (
             parsed.get("response", "Your request has been received."),
             parsed.get("product_area", "general"),
-            parsed.get("justification", "Based on retrieved documentation.")
+            parsed.get("justification", "Based on retrieved documentation."),
         )
     except json.JSONDecodeError:
         response = content if content else "Your request has been received and is being reviewed."
@@ -85,10 +84,10 @@ def generate_response(
             return (
                 "Your request requires specialist attention. A member of our support team will review your case and contact you shortly.",
                 "general",
-                f"LLM error - safe escalation fallback used. Error: {str(e)}"
+                f"LLM error - safe escalation fallback used. Error: {str(e)}",
             )
         return (
             "Thank you for contacting support. We have received your request and will respond as soon as possible.",
             "general",
-            f"LLM error - generic reply used. Error: {str(e)}"
+            f"LLM error - generic reply used. Error: {str(e)}",
         )

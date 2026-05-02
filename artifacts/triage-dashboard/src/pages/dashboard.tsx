@@ -191,42 +191,71 @@ export default function Dashboard() {
         </Card>
 
         {stats && (
-          <Card className="bg-card border-border h-[500px] flex flex-col">
+          <Card className="bg-card border-border">
             <CardHeader>
               <CardTitle className="font-mono text-lg">Risk Distribution</CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 flex items-center justify-center">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={[
-                      { name: 'High', value: stats.by_risk_level?.high || 0, color: 'hsl(var(--destructive))' },
-                      { name: 'Medium', value: stats.by_risk_level?.medium || 0, color: 'hsl(43 100% 50%)' },
-                      { name: 'Low', value: stats.by_risk_level?.low || 0, color: 'hsl(142 71% 45%)' },
-                    ]}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {
-                      [
-                        { name: 'High', value: stats.by_risk_level?.high || 0, color: 'hsl(var(--destructive))' },
-                        { name: 'Medium', value: stats.by_risk_level?.medium || 0, color: 'hsl(43 100% 50%)' },
-                        { name: 'Low', value: stats.by_risk_level?.low || 0, color: 'hsl(142 71% 45%)' },
-                      ].map((entry, index) => (
-                        <Cell key={'cell-' + index} fill={entry.color} />
-                      ))
-                    }
-                  </Pie>
-                  <Tooltip 
-                    contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}
-                    itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+            <CardContent className="space-y-4 pt-2">
+              {(() => {
+                const riskData = [
+                  { name: 'High', value: stats.by_risk_level?.high || 0, color: '#ef4444', bg: 'bg-red-500/10', text: 'text-red-400' },
+                  { name: 'Medium', value: stats.by_risk_level?.medium || 0, color: '#f59e0b', bg: 'bg-amber-500/10', text: 'text-amber-400' },
+                  { name: 'Low', value: stats.by_risk_level?.low || 0, color: '#22c55e', bg: 'bg-green-500/10', text: 'text-green-400' },
+                ];
+                const total = riskData.reduce((s, d) => s + d.value, 0) || 1;
+
+                // SVG donut chart
+                const cx = 100, cy = 100, R = 80, r = 52;
+                let angle = -Math.PI / 2;
+                const slices = riskData.map(d => {
+                  const sweep = (d.value / total) * 2 * Math.PI;
+                  const x1 = cx + R * Math.cos(angle);
+                  const y1 = cy + R * Math.sin(angle);
+                  angle += sweep;
+                  const x2 = cx + R * Math.cos(angle);
+                  const y2 = cy + R * Math.sin(angle);
+                  const xi1 = cx + r * Math.cos(angle);
+                  const yi1 = cy + r * Math.sin(angle);
+                  angle -= sweep;
+                  const xi2 = cx + r * Math.cos(angle);
+                  const yi2 = cy + r * Math.sin(angle);
+                  const large = sweep > Math.PI ? 1 : 0;
+                  const path = d.value === 0 ? '' :
+                    `M ${x1} ${y1} A ${R} ${R} 0 ${large} 1 ${x2} ${y2} L ${xi1} ${yi1} A ${r} ${r} 0 ${large} 0 ${xi2} ${yi2} Z`;
+                  angle += sweep;
+                  return { ...d, path };
+                });
+
+                return (
+                  <>
+                    <div className="flex justify-center">
+                      <svg width="200" height="200" viewBox="0 0 200 200">
+                        {slices.map((s, i) => s.path && (
+                          <path key={i} d={s.path} fill={s.color} opacity={0.9} />
+                        ))}
+                        <text x="100" y="96" textAnchor="middle" fill="#f1f5f9" fontSize="22" fontWeight="bold" fontFamily="monospace">{total}</text>
+                        <text x="100" y="114" textAnchor="middle" fill="#94a3b8" fontSize="11" fontFamily="monospace">tickets</text>
+                      </svg>
+                    </div>
+                    <div className="space-y-2">
+                      {riskData.map((d) => (
+                        <div key={d.name} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: d.color }} />
+                            <span className="font-mono text-sm text-muted-foreground uppercase tracking-wider">{d.name}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-24 h-1.5 bg-muted/30 rounded-full overflow-hidden">
+                              <div className="h-full rounded-full" style={{ width: `${(d.value / total) * 100}%`, backgroundColor: d.color }} />
+                            </div>
+                            <span className={`font-mono text-sm font-bold ${d.text}`}>{d.value}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                );
+              })()}
             </CardContent>
           </Card>
         )}

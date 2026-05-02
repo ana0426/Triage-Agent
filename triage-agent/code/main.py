@@ -197,6 +197,11 @@ def write_output_csv(results: List[dict]):
             writer.writerow({k: result.get(k, "") for k in fieldnames})
     _print(f"\n[bold green]Output written:[/bold green] {out_path}" if HAS_RICH else f"\nOutput: {out_path}")
 
+    # Write rich JSON sidecar for the dashboard (all fields)
+    json_path = out_path.parent / "output_full.json"
+    with open(json_path, "w", encoding="utf-8") as f:
+        json.dump(results, f, indent=2, default=str)
+
 
 def run_pipeline(tickets: List[dict]) -> List[dict]:
     clear_log()
