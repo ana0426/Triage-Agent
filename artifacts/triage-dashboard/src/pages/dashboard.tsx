@@ -16,7 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import {
   Loader2, UploadCloud, AlertCircle, Play, CheckCircle2,
-  ArrowRight, MessageSquare, TrendingUp, Shield, Brain,
+  ArrowRight, MessageSquare, TrendingUp, Brain,
   ChevronDown, Info
 } from "lucide-react";
 
@@ -80,36 +80,39 @@ function StatCard({
   );
 }
 
-function DonutChart({ high, medium, low, total }: { high: number; medium: number; low: number; total: number }) {
-  const t = total || 1;
-  const data = [
-    { value: high,   color: "#ef4444" },
-    { value: medium, color: "#f59e0b" },
-    { value: low,    color: "#22c55e" },
-  ];
-  const cx = 60, cy = 60, R = 50, r = 32;
-  let angle = -Math.PI / 2;
-  const slices = data.map(d => {
-    const sweep = (d.value / t) * 2 * Math.PI;
-    if (sweep === 0) { return { ...d, path: "" }; }
-    const x1 = cx + R * Math.cos(angle), y1 = cy + R * Math.sin(angle);
-    angle += sweep;
-    const x2 = cx + R * Math.cos(angle), y2 = cy + R * Math.sin(angle);
-    const xi1 = cx + r * Math.cos(angle), yi1 = cy + r * Math.sin(angle);
-    angle -= sweep;
-    const xi2 = cx + r * Math.cos(angle), yi2 = cy + r * Math.sin(angle);
-    const large = sweep > Math.PI ? 1 : 0;
-    const path = `M ${x1} ${y1} A ${R} ${R} 0 ${large} 1 ${x2} ${y2} L ${xi1} ${yi1} A ${r} ${r} 0 ${large} 0 ${xi2} ${yi2} Z`;
-    angle += sweep;
-    return { ...d, path };
-  });
+function RiskBar({ high, medium, low }: { high: number; medium: number; low: number }) {
+  const total = (high + medium + low) || 1;
+  const pctHigh   = (high   / total) * 100;
+  const pctMedium = (medium / total) * 100;
+  const pctLow    = (low    / total) * 100;
 
   return (
-    <svg width="120" height="120" viewBox="0 0 120 120">
-      {slices.map((s, i) => s.path && <path key={i} d={s.path} fill={s.color} />)}
-      <text x="60" y="56" textAnchor="middle" fill="#f1f5f9" fontSize="16" fontWeight="bold">{total}</text>
-      <text x="60" y="71" textAnchor="middle" fill="#94a3b8" fontSize="9">tickets</text>
-    </svg>
+    <div className="flex items-center gap-4 px-1">
+      {/* Stacked bar */}
+      <div className="flex h-2 flex-1 rounded-full overflow-hidden bg-muted/20 min-w-0">
+        {pctHigh   > 0 && <div className="h-full bg-red-500"   style={{ width: `${pctHigh}%`   }} />}
+        {pctMedium > 0 && <div className="h-full bg-amber-500" style={{ width: `${pctMedium}%` }} />}
+        {pctLow    > 0 && <div className="h-full bg-green-500" style={{ width: `${pctLow}%`    }} />}
+      </div>
+      {/* Labels */}
+      <div className="flex items-center gap-3 shrink-0 text-xs">
+        <span className="flex items-center gap-1.5 text-red-400">
+          <span className="w-2 h-2 rounded-full bg-red-500 inline-block" />
+          <span className="font-semibold">{high}</span>
+          <span className="text-muted-foreground">High</span>
+        </span>
+        <span className="flex items-center gap-1.5 text-amber-400">
+          <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+          <span className="font-semibold">{medium}</span>
+          <span className="text-muted-foreground">Medium</span>
+        </span>
+        <span className="flex items-center gap-1.5 text-green-400">
+          <span className="w-2 h-2 rounded-full bg-green-500 inline-block" />
+          <span className="font-semibold">{low}</span>
+          <span className="text-muted-foreground">Low</span>
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -265,11 +268,30 @@ export default function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Main Content: Batch Input + Risk Chart */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      {/* Risk Bar — compact strip below stats */}
+      {stats && (() => {
+        const high   = stats.by_risk_level?.high   || 0;
+        const medium = stats.by_risk_level?.medium || 0;
+        const low    = stats.by_risk_level?.low    || 0;
+        return (
+          <div className="rounded-xl border border-border bg-card px-5 py-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Risk Distribution</span>
+              {high > 0 && (
+                <span className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-full px-2.5 py-0.5">
+                  <AlertCircle size={11} />
+                  {high} need human review
+                </span>
+              )}
+            </div>
+            <RiskBar high={high} medium={medium} low={low} />
+          </div>
+        );
+      })()}
 
-        {/* Batch Input */}
-        <Card className="lg:col-span-2 border-border flex flex-col">
+      {/* Batch Input — full width */}
+      <div>
+        <Card className="border-border flex flex-col">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -357,75 +379,6 @@ Login error,Cannot sign in,HackerRank
             </div>
           </CardContent>
         </Card>
-
-        {/* Risk Distribution */}
-        {stats ? (
-          <Card className="border-border">
-            <CardHeader className="pb-2">
-              <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-red-500/10">
-                  <Shield className="w-4 h-4 text-red-400" />
-                </div>
-                <CardTitle className="text-base font-semibold">Risk Distribution</CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-2 space-y-5">
-              {(() => {
-                const high = stats.by_risk_level?.high || 0;
-                const medium = stats.by_risk_level?.medium || 0;
-                const low = stats.by_risk_level?.low || 0;
-                const total = (high + medium + low) || 1;
-
-                const levels = [
-                  { label: "High Risk",   value: high,   color: "#ef4444", textClass: "text-red-400",   bgClass: "bg-red-500"   },
-                  { label: "Medium Risk", value: medium, color: "#f59e0b", textClass: "text-amber-400", bgClass: "bg-amber-500" },
-                  { label: "Low Risk",    value: low,    color: "#22c55e", textClass: "text-green-400", bgClass: "bg-green-500" },
-                ];
-
-                return (
-                  <>
-                    <div className="flex justify-center">
-                      <DonutChart high={high} medium={medium} low={low} total={high + medium + low} />
-                    </div>
-                    <div className="space-y-3">
-                      {levels.map(l => (
-                        <div key={l.label}>
-                          <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs font-medium text-muted-foreground">{l.label}</span>
-                            <span className={`text-xs font-bold ${l.textClass}`}>
-                              {l.value} <span className="text-muted-foreground font-normal">({((l.value / total) * 100).toFixed(0)}%)</span>
-                            </span>
-                          </div>
-                          <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${l.bgClass}`}
-                              style={{ width: `${(l.value / total) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {high > 0 && (
-                      <div className="flex items-start gap-2 rounded-lg bg-red-500/10 border border-red-500/20 p-3">
-                        <AlertCircle className="w-3.5 h-3.5 text-red-400 mt-0.5 shrink-0" />
-                        <p className="text-xs text-red-400">
-                          <span className="font-semibold">{high} high-risk</span> ticket{high !== 1 ? 's' : ''} need immediate human review.
-                        </p>
-                      </div>
-                    )}
-                  </>
-                );
-              })()}
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="border-dashed border-border">
-            <CardContent className="h-full flex items-center justify-center text-center text-muted-foreground text-xs py-12">
-              Risk chart appears after first batch is processed
-            </CardContent>
-          </Card>
-        )}
       </div>
     </div>
   );
