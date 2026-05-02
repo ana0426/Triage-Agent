@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ShieldCheck, ArrowRight, Zap, Terminal } from "lucide-react";
 
 export function TerminalFeed() {
   const [lines, setLines] = useState<number>(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -10,6 +11,12 @@ export function TerminalFeed() {
     }, 800);
     return () => clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [lines]);
 
   const terminalLogs = [
     { time: "12:41:03", text: "ticket #T-2847 ingested", entity: "HackerRank", type: "info" },
@@ -44,6 +51,27 @@ export function TerminalFeed() {
         }
         .terminal-glow {
           box-shadow: 0 0 40px rgba(34, 197, 94, 0.1), inset 0 0 20px rgba(34, 197, 94, 0.05);
+        }
+        @keyframes logSlideIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .terminal-hero-wrapper .log-line {
+          animation: logSlideIn 0.3s ease-out both;
+        }
+        .terminal-hero-wrapper .terminal-scroll {
+          overflow-y: auto;
+          scroll-behavior: smooth;
+        }
+        .terminal-hero-wrapper .terminal-scroll::-webkit-scrollbar {
+          width: 4px;
+        }
+        .terminal-hero-wrapper .terminal-scroll::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .terminal-hero-wrapper .terminal-scroll::-webkit-scrollbar-thumb {
+          background: rgba(34, 197, 94, 0.2);
+          border-radius: 2px;
         }
       `}</style>
 
@@ -118,10 +146,10 @@ export function TerminalFeed() {
               </div>
 
               {/* Terminal Body */}
-              <div className="p-6 font-mono text-sm leading-loose h-[400px] overflow-hidden">
+              <div ref={scrollRef} className="p-6 font-mono text-sm leading-loose h-[400px] terminal-scroll">
                 <div className="flex flex-col gap-1">
                   {terminalLogs.slice(0, Math.max(1, lines)).map((log, i) => (
-                    <div key={i} className="flex gap-3 items-start animate-in fade-in slide-in-from-bottom-2 duration-300">
+                    <div key={i} className="log-line flex gap-3 items-start">
                       <span className="text-slate-600 shrink-0">[{log.time}]</span>
                       <span className="flex-1 break-all">
                         {log.icon && (
@@ -152,7 +180,7 @@ export function TerminalFeed() {
                       </span>
                     </div>
                   ))}
-                  <div className="flex gap-3 mt-1">
+                  <div className="log-line flex gap-3 mt-1">
                     <span className="text-slate-600 shrink-0">[{terminalLogs[Math.min(terminalLogs.length-1, Math.max(0, lines-1))].time}]</span>
                     <span className="w-2.5 h-4 bg-green-500/70 inline-block cursor-blink mt-1"></span>
                   </div>
