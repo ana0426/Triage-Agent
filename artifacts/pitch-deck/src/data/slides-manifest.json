@@ -4,12 +4,20 @@
     "position": 1,
     "filepath": "src/pages/slides/Slide1Title.tsx",
     "title": "TriageOps",
-    "description": "Title slide",
+    "description": "Title slide with network graph decoration and stats strip",
+    "speakerNotes": ""
+  },
+  {
+    "id": "a1b2c3d4-0009-4000-8000-000000000009",
+    "position": 2,
+    "filepath": "src/pages/slides/Slide2Hero.tsx",
+    "title": "TriageOps — Hero Visual",
+    "description": "Dark hero slide: product features, live dashboard mockup visual",
     "speakerNotes": ""
   },
   {
     "id": "a1b2c3d4-0002-4000-8000-000000000002",
-    "position": 2,
+    "position": 3,
     "filepath": "src/pages/slides/Slide2Problem.tsx",
     "title": "Support at Scale",
     "description": "The problem: manual routing, no context, missed escalations, fragmented products",
@@ -17,7 +25,7 @@
   },
   {
     "id": "a1b2c3d4-0003-4000-8000-000000000003",
-    "position": 3,
+    "position": 4,
     "filepath": "src/pages/slides/Slide3Pipeline.tsx",
     "title": "Four Stages to Resolution",
     "description": "Pipeline: Ingest, Classify, Retrieve, Respond",
@@ -25,42 +33,42 @@
   },
   {
     "id": "a1b2c3d4-0004-4000-8000-000000000004",
-    "position": 4,
+    "position": 5,
     "filepath": "src/pages/slides/Slide4Engine.tsx",
     "title": "Decisions Grounded in Data",
-    "description": "Triage engine: company detection, risk scoring, RAG retrieval, injection guard",
+    "description": "Triage engine with donut chart: company detection, risk scoring, RAG retrieval, injection guard",
     "speakerNotes": ""
   },
   {
     "id": "a1b2c3d4-0005-4000-8000-000000000005",
-    "position": 5,
+    "position": 6,
     "filepath": "src/pages/slides/Slide5Numbers.tsx",
     "title": "Built to Handle Volume",
-    "description": "Key numbers: 22 corpus docs, top-5 retrieval, auto escalation",
+    "description": "Analytics: decision distribution bars, company coverage, confidence histogram",
     "speakerNotes": ""
   },
   {
     "id": "a1b2c3d4-0006-4000-8000-000000000006",
-    "position": 6,
+    "position": 7,
     "filepath": "src/pages/slides/Slide6Dashboard.tsx",
     "title": "Live Monitoring Built In",
-    "description": "Dashboard: Command Center, Triage Results, Knowledge Base, System Logs",
+    "description": "Dashboard features + detailed dark-mode UI wireframe",
     "speakerNotes": ""
   },
   {
     "id": "a1b2c3d4-0007-4000-8000-000000000007",
-    "position": 7,
+    "position": 8,
     "filepath": "src/pages/slides/Slide7Stack.tsx",
     "title": "Solid Foundations",
-    "description": "Tech stack: Python agent, Express API, React dashboard",
+    "description": "3-layer architecture diagram: Presentation / API / Intelligence",
     "speakerNotes": ""
   },
   {
     "id": "a1b2c3d4-0008-4000-8000-000000000008",
-    "position": 8,
+    "position": 9,
     "filepath": "src/pages/slides/Slide8Closing.tsx",
     "title": "TriageOps — Closing",
-    "description": "Closing slide",
+    "description": "Closing slide with metric strip and concentric arc decoration",
     "speakerNotes": ""
   }
 ]
