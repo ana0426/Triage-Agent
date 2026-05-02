@@ -83,9 +83,10 @@ function readLogFromFile(): string {
 }
 
 function getMergedResults(): TriageResult[] {
-  const fileResults = readResultsFromFile();
-  if (fileResults.length > 0) return fileResults;
-  return resultStore;
+  // Prefer live in-memory results from the most recent web run.
+  // Only fall back to the file when no web run has happened this session.
+  if (resultStore.length > 0) return resultStore;
+  return readResultsFromFile();
 }
 
 // ─── Logging helpers ──────────────────────────────────────────────────────────

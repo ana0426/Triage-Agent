@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { 
   useProcessTickets, 
@@ -13,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, UploadCloud, AlertCircle, Play, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, UploadCloud, AlertCircle, Play, CheckCircle2, XCircle, ArrowRight } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
@@ -49,8 +50,10 @@ function parseCSVLine(line: string): string[] {
 
 export default function Dashboard() {
   const [csvInput, setCsvInput] = useState(SAMPLE_CSV);
+  const [lastProcessed, setLastProcessed] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, navigate] = useLocation();
 
   const { data: stats, isLoading: statsLoading } = useGetTriageStats({
     query: { queryKey: getGetTriageStatsQueryKey() }
@@ -59,15 +62,12 @@ export default function Dashboard() {
   const processMutation = useProcessTickets({
     mutation: {
       onSuccess: (data) => {
-        toast({
-          title: "Processing Complete",
-          description: `Successfully processed ${data.processed} tickets.`,
-        });
+        setLastProcessed(data.processed);
         queryClient.invalidateQueries({ queryKey: getGetTriageStatsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetTriageResultsQueryKey() });
         queryClient.invalidateQueries({ queryKey: getGetTriageLogsQueryKey() });
       },
-      onError: (error) => {
+      onError: () => {
         toast({
           title: "Processing Failed",
           description: "There was an error processing the tickets. Check the format.",
@@ -178,6 +178,32 @@ export default function Dashboard() {
           </Card>
         </motion.div>
       ) : null}
+
+      {lastProcessed !== null && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center justify-between gap-4 rounded-lg border border-green-500/30 bg-green-500/10 px-5 py-4"
+        >
+          <div className="flex items-center gap-3">
+            <CheckCircle2 className="w-5 h-5 text-green-400 shrink-0" />
+            <div>
+              <p className="font-mono text-sm font-semibold text-green-400">
+                {lastProcessed} ticket{lastProcessed !== 1 ? 's' : ''} processed — stats updated above
+              </p>
+              <p className="font-mono text-xs text-muted-foreground mt-0.5">
+                Click "Triage Results" in the sidebar (or the button on the right) to read each AI response
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={() => navigate("/results")}
+            className="shrink-0 font-mono uppercase tracking-wider bg-green-600 hover:bg-green-700 text-white"
+          >
+            View Responses <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </motion.div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
         <Card className="lg:col-span-2 bg-card border-border flex flex-col h-[500px]">
