@@ -363,7 +363,13 @@ router.post("/triage/corpus", (req, res) => {
 router.get("/triage/corpus", (_req, res) => {
   const docs = getAllDocuments();
   res.json({
-    documents: docs.map((d) => ({ id: d.id, source: d.source, title: d.title })),
+    documents: docs.map((d) => ({
+      id: d.id,
+      source: d.source,
+      title: d.title,
+      content: d.content,
+      url: d.url ?? null,
+    })),
     total: docs.length,
   });
 });
