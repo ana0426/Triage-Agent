@@ -451,7 +451,7 @@ Login error,Cannot sign in,HackerRank
               </div>
               <Button
                 onClick={handleProcess}
-                disabled={processMutation.isPending || !csvInput.trim() || ticketCount < 1}
+                disabled={processMutation.isPending || !csvInput.trim()}
                 className="font-medium"
               >
                 {processMutation.isPending ? (
