@@ -153,19 +153,28 @@ export default function Dashboard() {
     if (!csvInput.trim()) return;
     try {
       const lines = csvInput.split('\n').filter(line => line.trim());
-      if (lines.length < 2) throw new Error('Need at least a header row and one ticket row');
-      const header = parseCSVLine(lines[0]).map(h => h.toLowerCase());
+      if (lines.length < 2) throw new Error('Need at least a header row and one data row');
+      const header = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
       const subjectIdx = header.indexOf('subject');
-      const issueIdx = header.indexOf('issue');
+      const issueIdx   = header.indexOf('issue');
       const companyIdx = header.indexOf('company');
-      if (subjectIdx === -1 || issueIdx === -1) throw new Error('Header must include "subject" and "issue" columns');
+
+      if (subjectIdx === -1 && issueIdx === -1) {
+        throw new Error('Header must include at least a "subject" or "issue" column');
+      }
+
       const tickets = lines.slice(1).map((line, i) => {
         const values = parseCSVLine(line);
-        const subject = values[subjectIdx]?.trim() ?? '';
-        const issue = values[issueIdx]?.trim() ?? '';
-        const company = companyIdx !== -1 ? (values[companyIdx]?.trim() || null) : null;
-        if (!subject) throw new Error(`Row ${i + 1}: "subject" is empty`);
-        if (!issue) throw new Error(`Row ${i + 1}: "issue" is empty`);
+        const rawSubject = subjectIdx !== -1 ? (values[subjectIdx]?.trim() ?? '') : '';
+        const rawIssue   = issueIdx   !== -1 ? (values[issueIdx]?.trim()   ?? '') : '';
+        const company    = companyIdx !== -1 ? (values[companyIdx]?.trim() || null) : null;
+
+        // Graceful fallback: use each field as the other when one is missing
+        const subject = rawSubject || rawIssue;
+        const issue   = rawIssue   || rawSubject;
+
+        if (!subject) throw new Error(`Row ${i + 1}: both "subject" and "issue" are empty`);
+
         return { id: 't-' + Date.now() + '-' + i, subject, issue, company };
       });
       processMutation.mutate({ data: { tickets } });
