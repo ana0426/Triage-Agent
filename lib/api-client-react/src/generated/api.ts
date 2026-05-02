@@ -21,6 +21,7 @@ import type {
   CorpusDocumentResponse,
   CorpusListResponse,
   HealthStatus,
+  MutateCorpusResponse,
   ProcessTicketsBody,
   ProcessTicketsResponse,
   TriageLogsResponse,
@@ -427,6 +428,179 @@ export function useGetTriageStats<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * Update an existing corpus document by ID
+ * @summary Update corpus document
+ */
+export const getUpdateCorpusDocumentUrl = (id: string) => {
+  return `/api/triage/corpus/${id}`;
+};
+
+export const updateCorpusDocument = async (
+  id: string,
+  corpusDocumentBody: CorpusDocumentBody,
+  options?: RequestInit,
+): Promise<MutateCorpusResponse> => {
+  return customFetch<MutateCorpusResponse>(getUpdateCorpusDocumentUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(corpusDocumentBody),
+  });
+};
+
+export const getUpdateCorpusDocumentMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateCorpusDocument>>,
+    TError,
+    { id: string; data: BodyType<CorpusDocumentBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateCorpusDocument>>,
+  TError,
+  { id: string; data: BodyType<CorpusDocumentBody> },
+  TContext
+> => {
+  const mutationKey = ["updateCorpusDocument"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateCorpusDocument>>,
+    { id: string; data: BodyType<CorpusDocumentBody> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateCorpusDocument(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateCorpusDocumentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateCorpusDocument>>
+>;
+export type UpdateCorpusDocumentMutationBody = BodyType<CorpusDocumentBody>;
+export type UpdateCorpusDocumentMutationError = ErrorType<void>;
+
+/**
+ * @summary Update corpus document
+ */
+export const useUpdateCorpusDocument = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateCorpusDocument>>,
+    TError,
+    { id: string; data: BodyType<CorpusDocumentBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof updateCorpusDocument>>,
+  TError,
+  { id: string; data: BodyType<CorpusDocumentBody> },
+  TContext
+> => {
+  return useMutation(getUpdateCorpusDocumentMutationOptions(options));
+};
+
+/**
+ * Delete a corpus document by ID
+ * @summary Delete corpus document
+ */
+export const getDeleteCorpusDocumentUrl = (id: string) => {
+  return `/api/triage/corpus/${id}`;
+};
+
+export const deleteCorpusDocument = async (
+  id: string,
+  options?: RequestInit,
+): Promise<MutateCorpusResponse> => {
+  return customFetch<MutateCorpusResponse>(getDeleteCorpusDocumentUrl(id), {
+    ...options,
+    method: "DELETE",
+  });
+};
+
+export const getDeleteCorpusDocumentMutationOptions = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteCorpusDocument>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteCorpusDocument>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  const mutationKey = ["deleteCorpusDocument"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteCorpusDocument>>,
+    { id: string }
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return deleteCorpusDocument(id, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteCorpusDocumentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteCorpusDocument>>
+>;
+
+export type DeleteCorpusDocumentMutationError = ErrorType<void>;
+
+/**
+ * @summary Delete corpus document
+ */
+export const useDeleteCorpusDocument = <
+  TError = ErrorType<void>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteCorpusDocument>>,
+    TError,
+    { id: string },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof deleteCorpusDocument>>,
+  TError,
+  { id: string },
+  TContext
+> => {
+  return useMutation(getDeleteCorpusDocumentMutationOptions(options));
+};
 
 /**
  * Add a document to the support corpus

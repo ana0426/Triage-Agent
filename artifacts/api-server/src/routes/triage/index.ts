@@ -3,7 +3,7 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import fs from "fs";
 import path from "path";
 import os from "os";
-import { getAllDocuments, addDocument, chunkDocuments } from "./corpus.js";
+import { getAllDocuments, addDocument, deleteDocument, updateDocument, chunkDocuments } from "./corpus.js";
 import { retrieve } from "./retrieval.js";
 import { detectCompany, classifyRequestType, classifyProductArea } from "./classifier.js";
 import { assessRisk, shouldEscalate } from "./risk-engine.js";
@@ -349,6 +349,21 @@ router.get("/triage/stats", (_req, res) => {
   const avg_confidence = total > 0 ? results.reduce((s, r) => s + r.confidence, 0) / total : 0;
 
   res.json({ total, escalated, replied, by_company, by_request_type, by_risk_level, avg_confidence });
+});
+
+router.put("/triage/corpus/:id", (req, res) => {
+  const { id } = req.params;
+  const { source, title, content, url } = req.body as { source?: string; title?: string; content?: string; url?: string };
+  const updated = updateDocument(id, { source, title, content, url });
+  if (!updated) { res.status(404).json({ error: "Document not found" }); return; }
+  res.json({ success: true, id });
+});
+
+router.delete("/triage/corpus/:id", (req, res) => {
+  const { id } = req.params;
+  const deleted = deleteDocument(id);
+  if (!deleted) { res.status(404).json({ error: "Document not found" }); return; }
+  res.json({ success: true, id });
 });
 
 router.post("/triage/corpus", (req, res) => {

@@ -54,6 +54,25 @@ export function addDocument(source: string, title: string, content: string, url?
   return id;
 }
 
+export function deleteDocument(id: string): boolean {
+  const builtinIdx = CORPUS.findIndex((d) => d.id === id);
+  if (builtinIdx !== -1) { CORPUS.splice(builtinIdx, 1); return true; }
+  const customIdx = customDocuments.findIndex((d) => d.id === id);
+  if (customIdx !== -1) { customDocuments.splice(customIdx, 1); return true; }
+  return false;
+}
+
+export function updateDocument(
+  id: string,
+  fields: Partial<Pick<CorpusDocument, "source" | "title" | "content" | "url">>
+): boolean {
+  const inBuiltin = CORPUS.find((d) => d.id === id);
+  if (inBuiltin) { Object.assign(inBuiltin, fields); return true; }
+  const inCustom = customDocuments.find((d) => d.id === id);
+  if (inCustom) { Object.assign(inCustom, fields); return true; }
+  return false;
+}
+
 export function chunkDocuments(docs: CorpusDocument[], chunkSize = 200, overlap = 50): Chunk[] {
   const chunks: Chunk[] = [];
   for (const doc of docs) {

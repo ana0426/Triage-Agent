@@ -89,6 +89,55 @@ paths:
               schema:
                 $ref: "#/components/schemas/TriageStatsResponse"
 
+  /triage/corpus/{id}:
+    put:
+      operationId: updateCorpusDocument
+      tags: [triage]
+      summary: Update corpus document
+      description: Update an existing corpus document by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CorpusDocumentBody"
+      responses:
+        "200":
+          description: Document updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutateCorpusResponse"
+        "404":
+          description: Document not found
+
+    delete:
+      operationId: deleteCorpusDocument
+      tags: [triage]
+      summary: Delete corpus document
+      description: Delete a corpus document by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Document deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MutateCorpusResponse"
+        "404":
+          description: Document not found
+
   /triage/corpus:
     post:
       operationId: addCorpusDocument
@@ -312,6 +361,17 @@ components:
         - by_request_type
         - by_risk_level
         - avg_confidence
+
+    MutateCorpusResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        id:
+          type: string
+      required:
+        - success
+        - id
 
     CorpusDocumentBody:
       type: object

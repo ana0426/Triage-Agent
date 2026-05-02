@@ -106,6 +106,11 @@ export interface TriageStatsResponse {
   avg_confidence: number;
 }
 
+export interface MutateCorpusResponse {
+  success: boolean;
+  id: string;
+}
+
 export interface CorpusDocumentBody {
   source: string;
   title: string;

@@ -122,6 +122,39 @@ export const GetTriageStatsResponse = zod.object({
 });
 
 /**
+ * Update an existing corpus document by ID
+ * @summary Update corpus document
+ */
+export const UpdateCorpusDocumentParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const UpdateCorpusDocumentBody = zod.object({
+  source: zod.string(),
+  title: zod.string(),
+  content: zod.string(),
+  url: zod.string().nullish(),
+});
+
+export const UpdateCorpusDocumentResponse = zod.object({
+  success: zod.boolean(),
+  id: zod.string(),
+});
+
+/**
+ * Delete a corpus document by ID
+ * @summary Delete corpus document
+ */
+export const DeleteCorpusDocumentParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const DeleteCorpusDocumentResponse = zod.object({
+  success: zod.boolean(),
+  id: zod.string(),
+});
+
+/**
  * Add a document to the support corpus
  * @summary Add corpus document
  */
