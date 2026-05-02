@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Loader2, UploadCloud, AlertCircle, Play, CheckCircle2,
   ArrowRight, MessageSquare, TrendingUp, Brain,
-  ChevronDown, Info
+  ChevronDown, Info, Sparkles
 } from "lucide-react";
 
 const SAMPLE_CSV = `subject,issue,company
@@ -25,6 +25,42 @@ Login failing,Cannot login to my account since yesterday,HackerRank
 "My visa card got blocked, and there are unknown transactions with negative balance. Can you fix it?",Card Block and unknown balance,Visa
 API rate limits,We are hitting the rate limit on the Claude API,Claude
 Broken button,The submit button is grayed out,Generic`;
+
+const EXAMPLES: { label: string; tag: string; color: string; csv: string }[] = [
+  {
+    label: "HackerRank — Auth & Assessment",
+    tag: "HackerRank",
+    color: "bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20",
+    csv: `subject,issue,company
+Login failing,Cannot login to my HackerRank account since yesterday. Password reset email is not arriving.,HackerRank
+Assessment not loading,My timed coding assessment is stuck on a blank screen and the timer is counting down.,HackerRank
+Score not updated,I submitted my solution 2 hours ago but the score still shows 0 on the recruiter dashboard.,HackerRank`,
+  },
+  {
+    label: "Visa — Card & Transactions",
+    tag: "Visa",
+    color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30 hover:bg-yellow-500/20",
+    csv: `subject,issue,company
+Card blocked,My Visa card was suddenly blocked and I cannot make any purchases online or in-store.,Visa
+Unknown transaction,There is an unfamiliar charge of $349 on my statement from a merchant I do not recognise.,Visa
+Transaction logs missing,My transaction history is not showing up and the filter is not working in my Visa portal.,Visa`,
+  },
+  {
+    label: "Claude — API & Billing",
+    tag: "Claude",
+    color: "bg-purple-500/10 text-purple-400 border-purple-500/30 hover:bg-purple-500/20",
+    csv: `subject,issue,company
+API rate limit hit,We are consistently hitting the Claude API rate limit at peak hours and requests are being dropped.,Claude
+Context window issue,Claude keeps losing context in long conversations and forgets earlier messages in the thread.,Claude
+Billing discrepancy,Our invoice shows 4M tokens billed but our logs show only 1.2M tokens used this month.,Claude`,
+  },
+  {
+    label: "Mixed — Multi-product Batch",
+    tag: "Mixed",
+    color: "bg-primary/10 text-primary border-primary/30 hover:bg-primary/20",
+    csv: SAMPLE_CSV,
+  },
+];
 
 function parseCSVLine(line: string): string[] {
   const result: string[] = [];
@@ -355,6 +391,45 @@ Login error,Cannot sign in,HackerRank
           </CardHeader>
 
           <CardContent className="flex-1 flex flex-col pb-5 px-5 gap-3">
+
+            {/* Example presets */}
+            <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-2.5">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                <Sparkles size={11} />
+                Load an example
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {EXAMPLES.map((ex) => (
+                  <button
+                    key={ex.tag}
+                    onClick={() => handleCsvChange(ex.csv)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${ex.color}`}
+                  >
+                    {ex.label}
+                  </button>
+                ))}
+              </div>
+              {/* Preview of selected example */}
+              {EXAMPLES.some(e => csvInput === e.csv) && (() => {
+                const active = EXAMPLES.find(e => csvInput === e.csv)!;
+                const rows = active.csv.split('\n').slice(1);
+                return (
+                  <div className="pt-1 border-t border-border/50 space-y-1">
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Preview — {rows.length} ticket{rows.length !== 1 ? 's' : ''}</p>
+                    {rows.map((r, i) => {
+                      const parts = r.split(',');
+                      return (
+                        <div key={i} className="flex items-start gap-2 text-[11px]">
+                          <span className="w-4 h-4 rounded-full bg-muted/60 text-muted-foreground flex items-center justify-center font-mono shrink-0 mt-0.5">{i + 1}</span>
+                          <span className="text-foreground/80 leading-relaxed">{parts[0]?.replace(/^"|"$/g, '')}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+
             <Textarea
               value={csvInput}
               onChange={(e) => handleCsvChange(e.target.value)}
