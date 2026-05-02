@@ -19,9 +19,33 @@ import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, 
 
 const SAMPLE_CSV = `subject,issue,company
 Login failing,Cannot login to my account since yesterday,HackerRank
-New payment method,How do I add a new Visa card?,Visa
+"My visa card got blocked, and there are unknown transactions with negative balance. Can you fix it?",Card Block and unknown balance,Visa
 API rate limits,We are hitting the rate limit on the Claude API,Claude
 Broken button,The submit button is grayed out,Generic`;
+
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === ',' && !inQuotes) {
+      result.push(current.trim());
+      current = '';
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current.trim());
+  return result;
+}
 
 export default function Dashboard() {
   const [csvInput, setCsvInput] = useState(SAMPLE_CSV);
@@ -58,24 +82,28 @@ export default function Dashboard() {
 
     try {
       const lines = csvInput.split('\n').filter(line => line.trim());
-      const header = lines[0].split(',').map(h => h.trim().toLowerCase());
-      
+      if (lines.length < 2) throw new Error('Need at least a header row and one ticket row');
+
+      const header = parseCSVLine(lines[0]).map(h => h.toLowerCase());
+
+      const subjectIdx = header.indexOf('subject');
+      const issueIdx = header.indexOf('issue');
+      const companyIdx = header.indexOf('company');
+
+      if (subjectIdx === -1 || issueIdx === -1) {
+        throw new Error('Header row must include "subject" and "issue" columns');
+      }
+
       const tickets = lines.slice(1).map((line, i) => {
-        // Handle basic CSV parsing (not robust for quotes, but fine for simple cases)
-        const values = line.split(',').map(v => v.trim());
-        const ticket: any = { id: 't-' + Date.now() + '-' + i };
-        
-        header.forEach((h, idx) => {
-          if (h === 'subject') ticket.subject = values[idx] || '';
-          if (h === 'issue') ticket.issue = values[idx] || '';
-          if (h === 'company') ticket.company = values[idx] || null;
-        });
-        
-        if (!ticket.subject || !ticket.issue) {
-          throw new Error('Row ' + (i + 1) + ' is missing subject or issue');
-        }
-        
-        return ticket;
+        const values = parseCSVLine(line);
+        const subject = values[subjectIdx]?.trim() ?? '';
+        const issue = values[issueIdx]?.trim() ?? '';
+        const company = companyIdx !== -1 ? (values[companyIdx]?.trim() || null) : null;
+
+        if (!subject) throw new Error(`Row ${i + 1}: "subject" is empty`);
+        if (!issue) throw new Error(`Row ${i + 1}: "issue" is empty`);
+
+        return { id: 't-' + Date.now() + '-' + i, subject, issue, company };
       });
 
       processMutation.mutate({ data: { tickets } });
@@ -83,7 +111,7 @@ export default function Dashboard() {
       toast({
         title: "Parsing Error",
         description: e.message || "Failed to parse CSV input",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   };
@@ -159,7 +187,8 @@ export default function Dashboard() {
               Batch Input
             </CardTitle>
             <CardDescription className="font-mono text-xs">
-              Paste CSV data with headers: subject, issue, company
+              Paste CSV with headers: <span className="text-foreground">subject, issue, company</span>
+              {" — "}wrap fields containing commas in <span className="text-primary font-bold">"double quotes"</span>
             </CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col">
