@@ -48,12 +48,25 @@ function parseCSVLine(line: string): string[] {
   return result;
 }
 
+const STORAGE_KEY = "triage_batch_input";
+
 export default function Dashboard() {
-  const [csvInput, setCsvInput] = useState(SAMPLE_CSV);
+  const [csvInput, setCsvInput] = useState<string>(() => {
+    try {
+      return localStorage.getItem(STORAGE_KEY) ?? SAMPLE_CSV;
+    } catch {
+      return SAMPLE_CSV;
+    }
+  });
   const [lastProcessed, setLastProcessed] = useState<number | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [, navigate] = useLocation();
+
+  const handleCsvChange = (value: string) => {
+    setCsvInput(value);
+    try { localStorage.setItem(STORAGE_KEY, value); } catch { /* ignore */ }
+  };
 
   const { data: stats, isLoading: statsLoading } = useGetTriageStats({
     query: { queryKey: getGetTriageStatsQueryKey() }
@@ -220,7 +233,7 @@ export default function Dashboard() {
           <CardContent className="flex-1 flex flex-col">
             <Textarea 
               value={csvInput}
-              onChange={(e) => setCsvInput(e.target.value)}
+              onChange={(e) => handleCsvChange(e.target.value)}
               className="flex-1 font-mono text-sm resize-none bg-background/50 border-border focus-visible:ring-primary"
               placeholder="subject,issue,company..."
             />
