@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "QxOfMol7FkO9TR6lrTm7o"
+uri = "file://README.md"
+type = "text"
+title = "README.md — AI Support Triage Agent"
