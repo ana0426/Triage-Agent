@@ -5,9 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronRight, Search, Download } from "lucide-react";
+import { ChevronDown, ChevronRight, Search, Download, MessageSquare, AlertTriangle, FileText, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 export default function Results() {
@@ -21,16 +20,15 @@ export default function Results() {
 
   const toggleRow = (id: string) => {
     const newSet = new window.Set(expandedRows);
-    if (newSet.has(id)) newSet.delete(id);
-    else newSet.add(id);
+    if (newSet.has(id)) newSet.delete(id); else newSet.add(id);
     setExpandedRows(newSet);
   };
 
   const results = data?.results || [];
-
   const filteredResults = results.filter(r => {
-    const matchesSearch = r.subject.toLowerCase().includes(search.toLowerCase()) || 
-                          r.company.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch =
+      r.subject.toLowerCase().includes(search.toLowerCase()) ||
+      r.company.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === "all" || r.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
@@ -40,65 +38,94 @@ export default function Results() {
     const headers = ['id', 'subject', 'company', 'status', 'risk_level', 'confidence'];
     const csv = [
       headers.join(','),
-      ...filteredResults.map(r => [r.id, '"' + r.subject.replace(/"/g, '""') + '"', r.company, r.status, r.risk_level, r.confidence].join(','))
+      ...filteredResults.map(r => [
+        r.id, '"' + r.subject.replace(/"/g, '""') + '"',
+        r.company, r.status, r.risk_level, r.confidence
+      ].join(','))
     ].join('\n');
-    
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = 'triage_results.csv';
-    a.click();
+    a.href = url; a.download = 'triage_results.csv'; a.click();
   };
 
-  const getRiskColor = (risk: string) => {
+  const getRiskBadge = (risk: string) => {
     switch (risk) {
-      case 'high': return 'text-destructive border-destructive/20 bg-destructive/10';
-      case 'medium': return 'text-amber-500 border-amber-500/20 bg-amber-500/10';
-      case 'low': return 'text-green-500 border-green-500/20 bg-green-500/10';
-      default: return 'text-muted-foreground border-border';
+      case 'high':   return 'text-red-400 border-red-500/30 bg-red-500/10';
+      case 'medium': return 'text-amber-400 border-amber-500/30 bg-amber-500/10';
+      case 'low':    return 'text-green-400 border-green-500/30 bg-green-500/10';
+      default:       return 'text-muted-foreground border-border';
     }
-  };
-
-  const getStatusColor = (status: string) => {
-    return status === 'escalated' 
-      ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90' 
-      : 'bg-green-500 text-white hover:bg-green-600';
   };
 
   const getCompanyColor = (company: string) => {
     const c = company.toLowerCase();
-    if (c.includes('hackerrank')) return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
-    if (c.includes('claude')) return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
-    if (c.includes('visa')) return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-    return 'bg-muted text-muted-foreground';
+    if (c.includes('hackerrank')) return 'bg-blue-500/10 text-blue-400 border-blue-500/30';
+    if (c.includes('claude'))     return 'bg-purple-500/10 text-purple-400 border-purple-500/30';
+    if (c.includes('visa'))       return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30';
+    return 'bg-muted/50 text-muted-foreground border-border';
   };
 
+  const ConfidencePip = ({ value }: { value: number }) => {
+    const pct = Math.round(value * 100);
+    const color = pct >= 70 ? "bg-green-500" : pct >= 45 ? "bg-amber-500" : "bg-red-500";
+    const textColor = pct >= 70 ? "text-green-400" : pct >= 45 ? "text-amber-400" : "text-red-400";
+    return (
+      <div className="flex items-center gap-2">
+        <div className="w-16 h-1.5 bg-muted/30 rounded-full overflow-hidden">
+          <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+        </div>
+        <span className={`text-xs font-medium ${textColor}`}>{pct}%</span>
+      </div>
+    );
+  };
+
+  const replied = results.filter(r => r.status === 'replied').length;
+  const escalated = results.filter(r => r.status === 'escalated').length;
+
   return (
-    <div className="p-6 max-w-[1600px] mx-auto space-y-6">
+    <div className="p-6 max-w-[1600px] mx-auto space-y-5">
+
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-mono font-bold uppercase tracking-tight">Triage Results</h1>
-          <p className="text-muted-foreground mt-1 font-mono text-sm">Detailed view of processed tickets</p>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Triage Results</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Expand any row to read the full AI response and triage justification
+          </p>
         </div>
-        <Button onClick={downloadCSV} variant="outline" className="font-mono">
+        <Button onClick={downloadCSV} variant="outline" size="sm" disabled={!results.length}>
           <Download className="w-4 h-4 mr-2" /> Export CSV
         </Button>
       </div>
 
-      <div className="flex gap-4 items-center bg-card p-4 rounded-lg border border-border">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input 
-            placeholder="Search subject or company..." 
+      {/* Summary Chips */}
+      {results.length > 0 && (
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-xs text-muted-foreground">{results.length} total tickets</span>
+          <div className="flex items-center gap-1.5 text-xs text-green-400 bg-green-500/10 border border-green-500/20 rounded-full px-3 py-1">
+            <MessageSquare size={11} /> {replied} replied
+          </div>
+          <div className="flex items-center gap-1.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-full px-3 py-1">
+            <AlertTriangle size={11} /> {escalated} escalated
+          </div>
+        </div>
+      )}
+
+      {/* Filters */}
+      <div className="flex gap-3 items-center bg-card p-3 rounded-xl border border-border">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Search subject or company…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 font-mono bg-background"
+            className="pl-8 h-8 text-sm bg-background border-border"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px] font-mono bg-background">
-            <SelectValue placeholder="Filter Status" />
+          <SelectTrigger className="w-40 h-8 text-sm bg-background border-border">
+            <SelectValue placeholder="All statuses" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
@@ -106,101 +133,151 @@ export default function Results() {
             <SelectItem value="escalated">Escalated</SelectItem>
           </SelectContent>
         </Select>
+        {(search || statusFilter !== "all") && (
+          <span className="text-xs text-muted-foreground">{filteredResults.length} shown</span>
+        )}
       </div>
 
-      <div className="border border-border rounded-lg bg-card overflow-hidden">
+      {/* Table */}
+      <div className="border border-border rounded-xl bg-card overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="hover:bg-transparent border-border">
-              <TableHead className="w-[40px]"></TableHead>
-              <TableHead className="font-mono text-xs uppercase tracking-wider text-muted-foreground">ID</TableHead>
-              <TableHead className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Company</TableHead>
-              <TableHead className="font-mono text-xs uppercase tracking-wider text-muted-foreground w-1/3">Subject</TableHead>
-              <TableHead className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Status</TableHead>
-              <TableHead className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Risk</TableHead>
-              <TableHead className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Confidence</TableHead>
+            <TableRow className="hover:bg-transparent border-border bg-muted/20">
+              <TableHead className="w-10" />
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Company</TableHead>
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground w-2/5">Subject</TableHead>
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Status</TableHead>
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Risk</TableHead>
+              <TableHead className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Confidence</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={7} className="h-32 text-center text-muted-foreground font-mono">Loading results...</TableCell></TableRow>
+              <TableRow>
+                <TableCell colSpan={6} className="h-40 text-center text-muted-foreground text-sm">
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    Loading results…
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : filteredResults.length === 0 ? (
-              <TableRow><TableCell colSpan={7} className="h-32 text-center text-muted-foreground font-mono">No results found</TableCell></TableRow>
+              <TableRow>
+                <TableCell colSpan={6} className="h-40 text-center">
+                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                    <FileText size={28} className="opacity-30" />
+                    <p className="text-sm">No results found</p>
+                    {results.length === 0 && <p className="text-xs">Process a batch on the Command Center page first</p>}
+                  </div>
+                </TableCell>
+              </TableRow>
             ) : (
               filteredResults.map(row => (
                 <React.Fragment key={row.id}>
-                  <TableRow 
-                    className="cursor-pointer border-border hover:bg-muted/30 transition-colors"
+                  <TableRow
+                    className={cn(
+                      "cursor-pointer border-border hover:bg-muted/20 transition-colors group",
+                      expandedRows.has(row.id) && "bg-muted/10"
+                    )}
                     onClick={() => toggleRow(row.id)}
                   >
                     <TableCell>
-                      {expandedRows.has(row.id) ? 
-                        <ChevronDown className="w-4 h-4 text-muted-foreground" /> : 
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      }
+                      {expandedRows.has(row.id)
+                        ? <ChevronDown className="w-4 h-4 text-primary" />
+                        : <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />}
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-muted-foreground">{row.id.slice(0, 8)}</TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={cn("font-mono", getCompanyColor(row.company))}>
+                      <Badge variant="outline" className={cn("text-xs font-medium", getCompanyColor(row.company))}>
                         {row.company || 'Unknown'}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-medium truncate max-w-[300px]">{row.subject}</TableCell>
                     <TableCell>
-                      <Badge className={cn("font-mono uppercase text-xs tracking-wider", getStatusColor(row.status))}>
-                        {row.status}
+                      <span className="text-sm font-medium text-foreground line-clamp-1">{row.subject}</span>
+                      <span className="text-xs text-muted-foreground font-mono">{row.id.slice(0, 8)}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={cn(
+                        "text-xs font-semibold",
+                        row.status === 'escalated'
+                          ? 'bg-red-500/15 text-red-400 border border-red-500/30 hover:bg-red-500/20'
+                          : 'bg-green-500/15 text-green-400 border border-green-500/30 hover:bg-green-500/20'
+                      )}>
+                        {row.status === 'escalated' ? '⚠ Escalated' : '✓ Replied'}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline" className={cn("font-mono uppercase text-xs tracking-wider", getRiskColor(row.risk_level))}>
+                      <Badge variant="outline" className={cn("text-xs font-medium uppercase", getRiskBadge(row.risk_level))}>
                         {row.risk_level}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Progress value={row.confidence * 100} className="w-16 h-1.5" />
-                        <span className="font-mono text-xs text-muted-foreground">{(row.confidence * 100).toFixed(0)}%</span>
-                      </div>
+                      <ConfidencePip value={row.confidence} />
                     </TableCell>
                   </TableRow>
+
                   <AnimatePresence>
                     {expandedRows.has(row.id) && (
-                      <TableRow className="bg-muted/10 border-border hover:bg-muted/10">
-                        <TableCell colSpan={7} className="p-0 border-t-0">
-                          <motion.div 
+                      <TableRow className="bg-muted/5 border-border hover:bg-muted/5">
+                        <TableCell colSpan={6} className="p-0 border-t border-border/50">
+                          <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
                             exit={{ height: 0, opacity: 0 }}
                             className="overflow-hidden"
                           >
-                            <div className="p-6 grid grid-cols-2 gap-8">
-                              <div className="space-y-6">
+                            <div className="p-5 grid grid-cols-2 gap-5">
+
+                              {/* Left column */}
+                              <div className="space-y-4">
                                 <div>
-                                  <h4 className="font-mono text-xs uppercase text-muted-foreground mb-2">Original Issue</h4>
-                                  <div className="bg-background border border-border rounded p-4 text-sm text-foreground">
+                                  <div className="flex items-center gap-1.5 mb-2">
+                                    <FileText size={12} className="text-muted-foreground" />
+                                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Original Issue</h4>
+                                  </div>
+                                  <div className="bg-background border border-border rounded-lg p-3 text-sm text-foreground leading-relaxed">
                                     {row.issue}
                                   </div>
                                 </div>
                                 <div>
-                                  <h4 className="font-mono text-xs uppercase text-muted-foreground mb-2">AI Response</h4>
-                                  <div className="bg-background border border-border rounded p-4 text-sm font-medium text-primary">
-                                    {row.response || "No response generated (Escalated)"}
+                                  <div className="flex items-center gap-1.5 mb-2">
+                                    <MessageSquare size={12} className="text-primary" />
+                                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">AI Response</h4>
+                                  </div>
+                                  <div className={cn(
+                                    "rounded-lg p-3 text-sm leading-relaxed border-l-2",
+                                    row.status === 'escalated'
+                                      ? "bg-red-500/5 border border-red-500/20 border-l-red-500 text-muted-foreground italic"
+                                      : "bg-primary/5 border border-primary/20 border-l-primary text-foreground"
+                                  )}>
+                                    {row.response || "Ticket escalated to human agent — no automated response generated."}
                                   </div>
                                 </div>
                               </div>
-                              <div className="space-y-6">
+
+                              {/* Right column */}
+                              <div className="space-y-4">
                                 <div>
-                                  <h4 className="font-mono text-xs uppercase text-muted-foreground mb-2">Triage Justification</h4>
-                                  <div className="bg-background border border-border rounded p-4 text-sm text-foreground border-l-2 border-l-primary">
+                                  <div className="flex items-center gap-1.5 mb-2">
+                                    <AlertTriangle size={12} className="text-amber-400" />
+                                    <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Triage Justification</h4>
+                                  </div>
+                                  <div className="bg-background border border-border border-l-2 border-l-amber-500 rounded-lg p-3 text-sm text-foreground leading-relaxed">
                                     {row.justification}
                                   </div>
                                 </div>
+
                                 {row.retrieved_docs && row.retrieved_docs.length > 0 && (
                                   <div>
-                                    <h4 className="font-mono text-xs uppercase text-muted-foreground mb-2">Sources Referenced</h4>
-                                    <ul className="space-y-2">
+                                    <div className="flex items-center gap-1.5 mb-2">
+                                      <BookOpen size={12} className="text-muted-foreground" />
+                                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                        Knowledge Sources ({row.retrieved_docs.length})
+                                      </h4>
+                                    </div>
+                                    <ul className="space-y-1.5">
                                       {row.retrieved_docs.map((doc, i) => (
-                                        <li key={i} className="text-xs font-mono bg-background border border-border px-3 py-2 rounded text-muted-foreground flex items-center before:content-['>'] before:mr-2 before:text-primary">
+                                        <li key={i} className="flex items-center gap-2 text-xs bg-background border border-border px-3 py-2 rounded-lg text-muted-foreground">
+                                          <span className="w-4 h-4 rounded-full bg-primary/10 text-primary text-[10px] flex items-center justify-center font-bold shrink-0">{i + 1}</span>
                                           {doc}
                                         </li>
                                       ))}
