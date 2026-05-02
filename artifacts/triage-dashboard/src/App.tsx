@@ -2,8 +2,9 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import NotFound from "@/pages/not-found";
+import Hero from "@/pages/hero";
 import Dashboard from "@/pages/dashboard";
 import Results from "@/pages/results";
 import Logs from "@/pages/logs";
@@ -21,15 +22,20 @@ const queryClient = new QueryClient({
 
 function Router() {
   return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Dashboard} />
-        <Route path="/results" component={Results} />
-        <Route path="/logs" component={Logs} />
-        <Route path="/corpus" component={Corpus} />
-        <Route component={NotFound} />
-      </Switch>
-    </Layout>
+    <Switch>
+      <Route path="/" component={Hero} />
+      <Route>
+        <Layout>
+          <Switch>
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/results" component={Results} />
+            <Route path="/logs" component={Logs} />
+            <Route path="/corpus" component={Corpus} />
+            <Route component={NotFound} />
+          </Switch>
+        </Layout>
+      </Route>
+    </Switch>
   );
 }
 

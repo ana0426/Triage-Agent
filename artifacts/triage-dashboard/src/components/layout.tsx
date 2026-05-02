@@ -1,11 +1,11 @@
 import { Link, useLocation } from "wouter";
-import { LayoutDashboard, TableProperties, ScrollText, Database, ShieldCheck, Zap } from "lucide-react";
+import { LayoutDashboard, TableProperties, ScrollText, Database, ShieldCheck, Zap, Home } from "lucide-react";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
   const navItems = [
-    { href: "/", label: "Command Center", icon: LayoutDashboard, desc: "Submit & process tickets" },
+    { href: "/dashboard", label: "Command Center", icon: LayoutDashboard, desc: "Submit & process tickets" },
     { href: "/results", label: "Triage Results", icon: TableProperties, desc: "View AI responses" },
     { href: "/logs", label: "System Logs", icon: ScrollText, desc: "Decision traces" },
     { href: "/corpus", label: "Knowledge Base", icon: Database, desc: "RAG documents" },
@@ -29,6 +29,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-0.5">
+          {/* Back to home */}
+          <Link href="/" className="block mb-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+              <Home size={12} />
+              <span>Back to Home</span>
+            </div>
+          </Link>
+
           <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-3 mb-2">Navigation</p>
           {navItems.map((item) => {
             const isActive = location === item.href;

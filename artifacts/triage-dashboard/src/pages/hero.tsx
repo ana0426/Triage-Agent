@@ -1,159 +1,222 @@
-export default function Slide2Hero() {
+import { Link } from "wouter";
+import { ShieldCheck, ArrowRight, FileText, Clock, TrendingUp, Zap } from "lucide-react";
+
+export default function Hero() {
   return (
     <div
-      style={{
-        width: "100vw",
-        height: "100vh",
-        overflow: "hidden",
-        backgroundColor: "#0A0F1E",
-        fontFamily: "'Inter', sans-serif",
-        color: "#FFFFFF",
-        display: "flex",
-        flexDirection: "column",
-        boxSizing: "border-box",
-        position: "relative",
-      }}
+      className="min-h-screen w-full overflow-hidden relative flex flex-col"
+      style={{ backgroundColor: "#0A0F1E", fontFamily: "'Inter', sans-serif" }}
     >
-      {/* Grid background */}
-      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", opacity: 0.035, pointerEvents: "none" }} xmlns="http://www.w3.org/2000/svg">
+      {/* Subtle grid */}
+      <svg className="absolute inset-0 w-full h-full opacity-[0.035] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <pattern id="slide-grid" width="60" height="60" patternUnits="userSpaceOnUse">
+          <pattern id="hero-grid" width="60" height="60" patternUnits="userSpaceOnUse">
             <path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.8" />
           </pattern>
         </defs>
-        <rect width="100%" height="100%" fill="url(#slide-grid)" />
+        <rect width="100%" height="100%" fill="url(#hero-grid)" />
       </svg>
 
-      {/* Blue glow top-right */}
-      <div style={{ position: "absolute", top: "-20%", right: "-8%", width: "55vw", height: "60vh", background: "radial-gradient(ellipse at center, rgba(59,130,246,0.20) 0%, transparent 68%)", pointerEvents: "none" }} />
-      {/* Blue glow bottom-left */}
-      <div style={{ position: "absolute", bottom: "-10%", left: "-5%", width: "40vw", height: "45vh", background: "radial-gradient(ellipse at center, rgba(59,130,246,0.12) 0%, transparent 70%)", pointerEvents: "none" }} />
+      {/* Blue glow — top right */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          top: "-20%",
+          right: "-8%",
+          width: "55vw",
+          height: "60vh",
+          background: "radial-gradient(ellipse at center, rgba(59,130,246,0.20) 0%, transparent 68%)",
+        }}
+      />
+      {/* Blue glow — bottom left */}
+      <div
+        className="absolute pointer-events-none"
+        style={{
+          bottom: "-10%",
+          left: "-5%",
+          width: "40vw",
+          height: "45vh",
+          background: "radial-gradient(ellipse at center, rgba(59,130,246,0.12) 0%, transparent 70%)",
+        }}
+      />
 
-      {/* Top nav bar */}
-      <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "4vh 6vw 3vh", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "1vw" }}>
-          <div style={{ width: "2.2vw", height: "2.2vw", borderRadius: "0.5vw", background: "linear-gradient(135deg, #3B82F6, #1D4ED8)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg viewBox="0 0 18 18" style={{ width: "1.1vw", height: "1.1vw" }} fill="none"><path d="M9 2L3 5v4c0 3.3 2.5 6.3 6 7 3.5-.7 6-3.7 6-7V5L9 2z" stroke="white" strokeWidth="1.5" strokeLinejoin="round"/></svg>
+      {/* Nav bar */}
+      <nav className="relative z-10 flex items-center justify-between px-8 py-5 border-b border-white/5">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <ShieldCheck size={18} className="text-white" />
           </div>
-          <span style={{ fontSize: "1.1vw", fontWeight: 700, color: "#FFFFFF", letterSpacing: "-0.02em" }}>TriageOps</span>
-          <span style={{ fontSize: "0.9vw", fontWeight: 400, color: "rgba(255,255,255,0.3)" }}>AI Support Triage</span>
+          <div>
+            <span className="font-bold text-sm text-white tracking-tight">TriageOps</span>
+            <span className="text-xs text-white/30 ml-2">AI Support Triage</span>
+          </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "1.5vw" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5vw", fontSize: "0.85vw", color: "#4ADE80", backgroundColor: "rgba(34,197,94,0.1)", padding: "0.5vh 1vw", borderRadius: "2vw", border: "1px solid rgba(34,197,94,0.2)" }}>
-            <div style={{ width: "0.5vw", height: "0.5vw", borderRadius: "50%", backgroundColor: "#4ADE80" }} />
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 text-xs text-green-400 bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
             Live System
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5vw", fontSize: "0.85vw", color: "#FFFFFF", backgroundColor: "#3B82F6", padding: "0.5vh 1.2vw", borderRadius: "0.5vw", fontWeight: 500 }}>
-            Open Dashboard
-            <svg viewBox="0 0 14 14" style={{ width: "0.7vw", height: "0.7vw" }} fill="none"><path d="M2 7h10M8 3l4 4-4 4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          </div>
+          <Link href="/dashboard">
+            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors">
+              Open Dashboard
+              <ArrowRight size={14} />
+            </button>
+          </Link>
         </div>
-      </div>
+      </nav>
 
-      {/* Body */}
-      <div style={{ position: "relative", zIndex: 2, flex: 1, display: "flex", alignItems: "center", padding: "3vh 6vw", gap: "4vw" }}>
+      {/* Hero body */}
+      <div className="relative z-10 flex flex-1 items-center px-8 py-8 gap-8">
 
-        {/* Left: hero copy */}
-        <div style={{ flex: "0 0 42%", display: "flex", flexDirection: "column" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.6vw", marginBottom: "2.5vh" }}>
-            <div style={{ width: "0.5vw", height: "0.5vw", borderRadius: "50%", backgroundColor: "#4ADE80" }} />
-            <span style={{ fontSize: "0.85vw", fontWeight: 600, color: "rgba(255,255,255,0.4)", letterSpacing: "0.1em", textTransform: "uppercase" }}>HackerRank Orchestrate 2026</span>
+        {/* Left: headline + features */}
+        <div className="flex-none w-[44%] flex flex-col">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 mb-6 self-start">
+            <span className="w-2 h-2 rounded-full bg-green-400" />
+            <span className="text-xs font-semibold text-white/50 tracking-widest uppercase">HackerRank Orchestrate 2026</span>
           </div>
 
-          <h2 style={{ fontSize: "6vw", fontWeight: 200, letterSpacing: "-0.05em", margin: "0 0 2vh 0", lineHeight: 1.0, color: "#FFFFFF" }}>
-            Triage<span style={{ color: "#3B82F6" }}>Ops</span>
-          </h2>
+          {/* Headline */}
+          <h1
+            className="font-thin text-white leading-none mb-4"
+            style={{ fontSize: "clamp(3rem, 6vw, 5.5rem)", letterSpacing: "-0.04em" }}
+          >
+            Triage<span className="text-blue-500">Ops</span>
+          </h1>
 
-          <p style={{ fontSize: "1.35vw", fontWeight: 300, color: "rgba(255,255,255,0.5)", lineHeight: 1.6, letterSpacing: "-0.01em", marginBottom: "0.8vh" }}>
+          {/* Subheadline */}
+          <p className="text-white/50 font-light leading-relaxed mb-3" style={{ fontSize: "clamp(0.95rem, 1.5vw, 1.2rem)" }}>
             AI-powered support triage for enterprise scale.
           </p>
-          <p style={{ fontSize: "1.1vw", fontWeight: 300, color: "rgba(255,255,255,0.3)", lineHeight: 1.6, marginBottom: "3.5vh" }}>
-            Classifies, retrieves context, generates grounded responses, and escalates automatically for HackerRank, Claude, and Visa.
+          <p className="text-white/35 font-light leading-relaxed mb-8" style={{ fontSize: "clamp(0.85rem, 1.2vw, 1rem)" }}>
+            Processes tickets for HackerRank, Claude, and Visa — classifying, retrieving context from 22 corpus documents, generating grounded LLM responses, and escalating automatically based on confidence scoring.
           </p>
 
           {/* Feature rows */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "2.2vh", marginBottom: "3.5vh" }}>
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "1.2vw" }}>
-              <div style={{ flexShrink: 0, width: "2.2vw", height: "2.2vw", borderRadius: "0.5vw", backgroundColor: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg viewBox="0 0 16 16" style={{ width: "0.9vw", height: "0.9vw" }} fill="none"><rect x="2" y="2" width="12" height="12" rx="1.5" stroke="#60A5FA" strokeWidth="1.5"/><line x1="5" y1="6" x2="11" y2="6" stroke="#60A5FA" strokeWidth="1.2" strokeLinecap="round"/><line x1="5" y1="9" x2="9" y2="9" stroke="#60A5FA" strokeWidth="1.2" strokeLinecap="round"/></svg>
+          <div className="flex flex-col gap-4 mb-8">
+            <div className="flex items-start gap-4">
+              <div
+                className="flex-none w-10 h-10 rounded-xl flex items-center justify-center border"
+                style={{ backgroundColor: "rgba(59,130,246,0.12)", borderColor: "rgba(59,130,246,0.25)" }}
+              >
+                <FileText size={16} className="text-blue-400" />
               </div>
               <div>
-                <div style={{ fontSize: "1.15vw", fontWeight: 600, color: "#FFFFFF" }}>Batch CSV Processing</div>
-                <div style={{ fontSize: "1vw", fontWeight: 400, color: "rgba(255,255,255,0.35)", marginTop: "0.3vh", lineHeight: 1.4 }}>Upload hundreds of tickets at once with example presets for all 3 companies.</div>
+                <div className="text-sm font-semibold text-white">Batch CSV Processing</div>
+                <div className="text-xs text-white/40 mt-0.5 leading-relaxed">Upload hundreds of tickets at once. Example presets included for HackerRank, Claude, and Visa.</div>
               </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "1.2vw" }}>
-              <div style={{ flexShrink: 0, width: "2.2vw", height: "2.2vw", borderRadius: "0.5vw", backgroundColor: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg viewBox="0 0 16 16" style={{ width: "0.9vw", height: "0.9vw" }} fill="none"><circle cx="8" cy="8" r="6" stroke="#60A5FA" strokeWidth="1.5"/><path d="M8 5v3l2 1.5" stroke="#60A5FA" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <div className="flex items-start gap-4">
+              <div
+                className="flex-none w-10 h-10 rounded-xl flex items-center justify-center border"
+                style={{ backgroundColor: "rgba(59,130,246,0.12)", borderColor: "rgba(59,130,246,0.25)" }}
+              >
+                <Clock size={16} className="text-blue-400" />
               </div>
               <div>
-                <div style={{ fontSize: "1.15vw", fontWeight: 600, color: "#FFFFFF" }}>Sub-2s Response Time</div>
-                <div style={{ fontSize: "1vw", fontWeight: 400, color: "rgba(255,255,255,0.35)", marginTop: "0.3vh", lineHeight: 1.4 }}>End-to-end from submission to grounded AI reply. BM25 + TF-IDF hybrid retrieval.</div>
+                <div className="text-sm font-semibold text-white">Sub-2s Response Time</div>
+                <div className="text-xs text-white/40 mt-0.5 leading-relaxed">End-to-end latency from submission to grounded AI reply. BM25 + TF-IDF hybrid retrieval over 22 documents.</div>
               </div>
             </div>
 
-            <div style={{ display: "flex", alignItems: "flex-start", gap: "1.2vw" }}>
-              <div style={{ flexShrink: 0, width: "2.2vw", height: "2.2vw", borderRadius: "0.5vw", backgroundColor: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.25)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg viewBox="0 0 16 16" style={{ width: "0.9vw", height: "0.9vw" }} fill="none"><path d="M2 12 L5 8 L9 10 L14 4" stroke="#60A5FA" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            <div className="flex items-start gap-4">
+              <div
+                className="flex-none w-10 h-10 rounded-xl flex items-center justify-center border"
+                style={{ backgroundColor: "rgba(59,130,246,0.12)", borderColor: "rgba(59,130,246,0.25)" }}
+              >
+                <TrendingUp size={16} className="text-blue-400" />
               </div>
               <div>
-                <div style={{ fontSize: "1.15vw", fontWeight: 600, color: "#FFFFFF" }}>78% Auto-Reply Rate</div>
-                <div style={{ fontSize: "1vw", fontWeight: 400, color: "rgba(255,255,255,0.35)", marginTop: "0.3vh", lineHeight: 1.4 }}>Only 22% escalated to humans. Confidence threshold tunable per domain.</div>
+                <div className="text-sm font-semibold text-white">78% Auto-Reply Rate</div>
+                <div className="text-xs text-white/40 mt-0.5 leading-relaxed">Only 22% of tickets escalated to human agents. Confidence-score threshold is tunable per domain.</div>
               </div>
             </div>
           </div>
 
+          {/* CTA */}
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard">
+              <button className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-xl text-sm transition-colors shadow-lg shadow-blue-500/25">
+                <Zap size={15} />
+                Launch Dashboard
+              </button>
+            </Link>
+            <Link href="/corpus">
+              <button className="px-6 py-3 text-white/50 hover:text-white text-sm font-medium rounded-xl border border-white/10 hover:border-white/20 transition-colors">
+                View Knowledge Base
+              </button>
+            </Link>
+          </div>
+
           {/* Stats strip */}
-          <div style={{ display: "flex", alignItems: "center", gap: "2vw", paddingTop: "2.5vh", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1.8vw", fontWeight: 200, color: "#3B82F6", letterSpacing: "-0.03em" }}>22</div>
-              <div style={{ fontSize: "0.7vw", fontWeight: 500, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "0.3vh" }}>Corpus Docs</div>
+          <div className="flex items-center gap-6 mt-8 pt-6 border-t border-white/5">
+            <div>
+              <div className="text-xl font-thin text-blue-400" style={{ letterSpacing: "-0.03em" }}>22</div>
+              <div className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">Corpus Docs</div>
             </div>
-            <div style={{ width: "1px", height: "3vh", background: "rgba(255,255,255,0.1)" }} />
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1.8vw", fontWeight: 200, color: "#FFFFFF", letterSpacing: "-0.03em" }}>3</div>
-              <div style={{ fontSize: "0.7vw", fontWeight: 500, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "0.3vh" }}>Companies</div>
+            <div className="w-px h-8 bg-white/10" />
+            <div>
+              <div className="text-xl font-thin text-white" style={{ letterSpacing: "-0.03em" }}>3</div>
+              <div className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">Companies</div>
             </div>
-            <div style={{ width: "1px", height: "3vh", background: "rgba(255,255,255,0.1)" }} />
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1.8vw", fontWeight: 200, color: "#FFFFFF", letterSpacing: "-0.03em" }}>Top 5</div>
-              <div style={{ fontSize: "0.7vw", fontWeight: 500, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "0.3vh" }}>Chunks/Ticket</div>
+            <div className="w-px h-8 bg-white/10" />
+            <div>
+              <div className="text-xl font-thin text-white" style={{ letterSpacing: "-0.03em" }}>Top 5</div>
+              <div className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">Chunks / Ticket</div>
             </div>
-            <div style={{ width: "1px", height: "3vh", background: "rgba(255,255,255,0.1)" }} />
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1.8vw", fontWeight: 200, color: "#3B82F6", letterSpacing: "-0.03em" }}>&lt;2s</div>
-              <div style={{ fontSize: "0.7vw", fontWeight: 500, color: "rgba(255,255,255,0.3)", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "0.3vh" }}>Avg Response</div>
+            <div className="w-px h-8 bg-white/10" />
+            <div>
+              <div className="text-xl font-thin text-blue-400" style={{ letterSpacing: "-0.03em" }}>&lt;2s</div>
+              <div className="text-[10px] text-white/30 uppercase tracking-widest mt-0.5">Avg Response</div>
             </div>
           </div>
         </div>
 
-        {/* Right: exact dashboard mockup SVG — matches the hero page */}
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "flex-end" }}>
-          <svg viewBox="0 0 520 380" style={{ width: "100%", height: "auto", filter: "drop-shadow(0 20px 60px rgba(0,0,0,0.75))" }}>
+        {/* Right: dashboard screenshot mock */}
+        <div className="flex-1 flex items-center justify-end">
+          <svg
+            viewBox="0 0 520 380"
+            className="w-full h-auto"
+            style={{ filter: "drop-shadow(0 24px 64px rgba(0,0,0,0.75))", maxWidth: "640px" }}
+          >
+            {/* Window frame */}
+            <rect x="0" y="0" width="520" height="380" rx="12" fill="#0F172A" />
+            {/* Gradient border */}
+            <rect x="0" y="0" width="520" height="2" rx="1" fill="url(#topGrad)" />
             <defs>
-              <linearGradient id="s2-topGrad" x1="0" y1="0" x2="520" y2="0" gradientUnits="userSpaceOnUse">
+              <linearGradient id="topGrad" x1="0" y1="0" x2="520" y2="0" gradientUnits="userSpaceOnUse">
                 <stop offset="0%" stopColor="#3B82F6" stopOpacity="0" />
                 <stop offset="30%" stopColor="#3B82F6" />
                 <stop offset="70%" stopColor="#6366F1" />
                 <stop offset="100%" stopColor="#6366F1" stopOpacity="0" />
               </linearGradient>
             </defs>
-            <rect x="0" y="0" width="520" height="380" rx="12" fill="#0F172A" />
-            <rect x="0" y="0" width="520" height="2" rx="1" fill="url(#s2-topGrad)" />
+
+            {/* Chrome bar */}
             <rect x="0" y="0" width="520" height="36" rx="12" fill="#1E293B" />
             <rect x="0" y="26" width="520" height="10" fill="#1E293B" />
+
+            {/* Traffic lights */}
             <circle cx="18" cy="18" r="5.5" fill="#EF4444" opacity="0.85" />
             <circle cx="34" cy="18" r="5.5" fill="#F59E0B" opacity="0.85" />
             <circle cx="50" cy="18" r="5.5" fill="#22C55E" opacity="0.85" />
+
+            {/* URL bar */}
             <rect x="110" y="10" width="180" height="17" rx="8" fill="#334155" />
             <text x="200" y="21" textAnchor="middle" fontSize="7.5" fill="#64748B">triageops / command-center</text>
+
+            {/* Live badge */}
             <rect x="458" y="12" width="48" height="13" rx="6" fill="#14532D" />
             <circle cx="467" cy="18.5" r="3" fill="#22C55E" />
             <text x="483" y="22" textAnchor="middle" fontSize="6.5" fill="#22C55E">LIVE</text>
+
+            {/* Sidebar */}
             <rect x="0" y="36" width="86" height="344" fill="#1E293B" />
             <rect x="8" y="48" width="70" height="14" rx="5" fill="#3B82F6" />
             <text x="43" y="58" textAnchor="middle" fontSize="7.5" fill="#FFFFFF" fontWeight="600">TriageOps</text>
+
+            {/* Active nav indicator */}
             <rect x="0" y="76" width="3" height="16" rx="1" fill="#3B82F6" />
             <rect x="12" y="78" width="10" height="10" rx="2" fill="#3B82F6" opacity="0.5" />
             <text x="27" y="85" fontSize="7" fill="#3B82F6" fontWeight="500">Dashboard</text>
@@ -164,9 +227,16 @@ export default function Slide2Hero() {
             <rect x="12" y="144" width="10" height="10" rx="2" fill="#334155" />
             <text x="27" y="151" fontSize="7" fill="#475569">Logs</text>
             <line x1="12" y1="168" x2="74" y2="168" stroke="#334155" strokeWidth="0.5" />
+            <text x="43" y="180" textAnchor="middle" fontSize="6" fill="#334155">v1.0.0</text>
+
+            {/* Main content */}
             <rect x="86" y="36" width="434" height="344" fill="#0F172A" />
+
+            {/* Page title */}
             <text x="100" y="57" fontSize="13" fontWeight="200" fill="#94A3B8">Command</text>
             <text x="168" y="57" fontSize="13" fontWeight="600" fill="#3B82F6"> Center</text>
+
+            {/* Stat cards */}
             <rect x="100" y="64" width="92" height="46" rx="7" fill="#1E293B" />
             <rect x="200" y="64" width="92" height="46" rx="7" fill="#1E293B" />
             <rect x="300" y="64" width="92" height="46" rx="7" fill="#1E293B" />
@@ -179,6 +249,8 @@ export default function Slide2Hero() {
             <text x="346" y="103" textAnchor="middle" fontSize="6.5" fill="#64748B">Escalated</text>
             <text x="454" y="84" textAnchor="middle" fontSize="15" fontWeight="200" fill="#3B82F6">0.42</text>
             <text x="454" y="103" textAnchor="middle" fontSize="6.5" fill="#64748B">Avg Confidence</text>
+
+            {/* Risk bar */}
             <text x="100" y="125" fontSize="7.5" fill="#475569" letterSpacing="0.8">RISK DISTRIBUTION</text>
             <rect x="100" y="130" width="408" height="10" rx="5" fill="#1E293B" />
             <rect x="100" y="130" width="245" height="10" rx="5" fill="#22C55E" opacity="0.7" />
@@ -187,6 +259,8 @@ export default function Slide2Hero() {
             <text x="100" y="148" fontSize="6" fill="#64748B">Low risk (60%)</text>
             <text x="386" y="148" textAnchor="middle" fontSize="6" fill="#64748B">Med (20%)</text>
             <text x="508" y="148" textAnchor="end" fontSize="6" fill="#64748B">High (20%)</text>
+
+            {/* Company bars */}
             <text x="100" y="163" fontSize="7.5" fill="#475569" letterSpacing="0.8">COMPANY BREAKDOWN</text>
             <rect x="100" y="167" width="120" height="7" rx="3" fill="#1E3A5F" />
             <text x="226" y="174" fontSize="6.5" fill="#60A5FA">HackerRank 40%</text>
@@ -194,12 +268,16 @@ export default function Slide2Hero() {
             <text x="201" y="185" fontSize="6.5" fill="#93C5FD">Claude 35%</text>
             <rect x="100" y="189" width="68" height="7" rx="3" fill="#1A1A3E" />
             <text x="174" y="196" fontSize="6.5" fill="#C4B5FD">Visa 25%</text>
+
+            {/* Table header */}
             <rect x="100" y="205" width="408" height="16" rx="4" fill="#1E293B" />
             <text x="108" y="215" fontSize="6.5" fill="#475569" letterSpacing="0.5">STATUS</text>
             <text x="172" y="215" fontSize="6.5" fill="#475569" letterSpacing="0.5">COMPANY</text>
             <text x="240" y="215" fontSize="6.5" fill="#475569" letterSpacing="0.5">SUBJECT</text>
             <text x="390" y="215" fontSize="6.5" fill="#475569" letterSpacing="0.5">SCORE</text>
             <text x="440" y="215" fontSize="6.5" fill="#475569" letterSpacing="0.5">TIME</text>
+
+            {/* Row 1 */}
             <rect x="100" y="224" width="408" height="15" rx="2" fill="rgba(34,197,94,0.05)" />
             <rect x="104" y="227" width="40" height="8" rx="4" fill="#16A34A" opacity="0.85" />
             <text x="124" y="233" textAnchor="middle" fontSize="5.5" fill="#FFFFFF">auto</text>
@@ -210,6 +288,8 @@ export default function Slide2Hero() {
             <rect x="386" y="227" width="28" height="8" rx="2" fill="#22C55E" opacity="0.6" />
             <text x="406" y="233" textAnchor="middle" fontSize="5.5" fill="#FFFFFF">0.67</text>
             <text x="440" y="233" fontSize="5.5" fill="#475569">0.8s</text>
+
+            {/* Row 2 */}
             <rect x="100" y="241" width="408" height="15" rx="2" fill="rgba(255,255,255,0.01)" />
             <rect x="104" y="244" width="40" height="8" rx="4" fill="#16A34A" opacity="0.85" />
             <text x="124" y="250" textAnchor="middle" fontSize="5.5" fill="#FFFFFF">auto</text>
@@ -220,6 +300,8 @@ export default function Slide2Hero() {
             <rect x="386" y="244" width="31" height="8" rx="2" fill="#22C55E" opacity="0.6" />
             <text x="406" y="250" textAnchor="middle" fontSize="5.5" fill="#FFFFFF">0.71</text>
             <text x="440" y="250" fontSize="5.5" fill="#475569">1.1s</text>
+
+            {/* Row 3 — escalated */}
             <rect x="100" y="258" width="408" height="15" rx="2" fill="rgba(239,68,68,0.05)" />
             <rect x="104" y="261" width="40" height="8" rx="4" fill="#DC2626" opacity="0.85" />
             <text x="124" y="267" textAnchor="middle" fontSize="5.5" fill="#FFFFFF">escalate</text>
@@ -230,6 +312,8 @@ export default function Slide2Hero() {
             <rect x="386" y="261" width="9" height="8" rx="2" fill="#EF4444" opacity="0.7" />
             <text x="406" y="267" textAnchor="middle" fontSize="5.5" fill="#FFFFFF">0.21</text>
             <text x="440" y="267" fontSize="5.5" fill="#475569">1.4s</text>
+
+            {/* Row 4 */}
             <rect x="100" y="275" width="408" height="15" rx="2" fill="rgba(255,255,255,0.01)" />
             <rect x="104" y="278" width="40" height="8" rx="4" fill="#16A34A" opacity="0.85" />
             <text x="124" y="284" textAnchor="middle" fontSize="5.5" fill="#FFFFFF">auto</text>
@@ -240,6 +324,8 @@ export default function Slide2Hero() {
             <rect x="386" y="278" width="23" height="8" rx="2" fill="#22C55E" opacity="0.6" />
             <text x="406" y="284" textAnchor="middle" fontSize="5.5" fill="#FFFFFF">0.55</text>
             <text x="440" y="284" fontSize="5.5" fill="#475569">0.9s</text>
+
+            {/* Action bar */}
             <rect x="100" y="300" width="408" height="40" rx="7" fill="#1E293B" />
             <rect x="108" y="309" width="90" height="22" rx="6" fill="#3B82F6" />
             <text x="153" y="322.5" textAnchor="middle" fontSize="8" fill="#FFFFFF" fontWeight="500">Run Triage</text>
@@ -254,10 +340,12 @@ export default function Slide2Hero() {
         </div>
       </div>
 
-      {/* Footer */}
-      <div style={{ position: "relative", zIndex: 2, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "2vh 6vw", borderTop: "1px solid rgba(255,255,255,0.05)" }}>
-        <span style={{ fontSize: "0.85vw", color: "rgba(255,255,255,0.2)" }}>Python · Express · React · GPT-4o-mini</span>
-        <span style={{ fontSize: "0.85vw", color: "rgba(255,255,255,0.2)" }}>HackerRank Orchestrate Hackathon · 2026</span>
+      {/* Footer strip */}
+      <div className="relative z-10 flex items-center justify-between px-8 py-4 border-t border-white/5">
+        <div className="flex items-center gap-6">
+          <span className="text-xs text-white/20">Python · Express · React · GPT-4o-mini</span>
+        </div>
+        <span className="text-xs text-white/20">HackerRank Orchestrate Hackathon · 2026</span>
       </div>
     </div>
   );
